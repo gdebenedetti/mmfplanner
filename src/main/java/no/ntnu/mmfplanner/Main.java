@@ -9,10 +9,10 @@
 
 package no.ntnu.mmfplanner;
 
-import no.ntnu.mmfplanner.ui.MainFrame;
-
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+
+import no.ntnu.mmfplanner.ui.MainFrame;
 
 /**
  * The Main class sets the GUI look-and-feel like the system you are using
@@ -45,6 +45,7 @@ public class Main {
                 //m.initTestData1();
                 m.initTestData2();
                 m.setVisible(true);
+                m.setExtendedState(m.getExtendedState() | JFrame.MAXIMIZED_BOTH);
             }
         });
     }
