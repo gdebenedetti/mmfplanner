@@ -28,24 +28,24 @@ import no.ntnu.mmfplanner.ui.MainFrame;
 /**
  * Action for opening a project from file.
  */
-public class OpenJiraAction extends MainAbstractAction {
+public class OpenHPAgileAction extends MainAbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String ACTION_NAME = "Import Jira Project...";
+	public static final String ACTION_NAME = "Import HP Agile Manager Project...";
 
-	public static final int ACTION_MNEMONIC = KeyEvent.VK_J;
+	public static final int ACTION_MNEMONIC = KeyEvent.VK_H;
 
 	public static final String ACTION_ACCELERATOR = "ctrl O";
 
-	public static final String ACTION_DESCRIPTION = "Import a project from Jira";
+	public static final String ACTION_DESCRIPTION = "Import a project from HP Agile Manager";
 
-	public OpenJiraAction(MainFrame mainFrame) {
+	public OpenHPAgileAction(MainFrame mainFrame) {
 		super(mainFrame, ACTION_NAME, ACTION_MNEMONIC, ACTION_ACCELERATOR, ACTION_DESCRIPTION);
-		URL jiraLogo = getClass().getClassLoader().getResource("jira.png");
-		if (jiraLogo != null) {
-			putValue(Action.LARGE_ICON_KEY,
-					new ImageIcon(new ImageIcon(jiraLogo).getImage().getScaledInstance(165, 75, Image.SCALE_SMOOTH)));
+		URL hpAgileManagerLogo = getClass().getClassLoader().getResource("hp_agile_manager.png");
+		if (hpAgileManagerLogo != null) {
+			putValue(Action.LARGE_ICON_KEY, new ImageIcon(new ImageIcon(hpAgileManagerLogo).getImage()
+					.getScaledInstance(80, 80, Image.SCALE_SMOOTH)));
 		}
 	}
 
@@ -71,13 +71,13 @@ public class OpenJiraAction extends MainAbstractAction {
 			// serialize and write to file
 			File file = fc.getSelectedFile();
 			InputStream is = new BufferedInputStream(new FileInputStream(file));
-			// TODO Read Jira File
+			// TODO Read HP Agile Manager File
 			// Project project = XmlDeserializer.readProject(mainFrame.getTabPanePanelPlacement(), is);
 			// mainFrame.setModel(project);
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(mainFrame, "An error occured while opening Jira project:\n" + e, "Error",
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(mainFrame, "An error occured while opening HP Agile Manager project:\n" + e,
+					"Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

@@ -1,25 +1,31 @@
+/*
+ * Copyright (C) 2017 Guido De Benedetti
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation.
+ */
+
 package no.ntnu.mmfplanner.ui;
 
 import java.awt.Component;
-import java.awt.Image;
-import java.net.URL;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 
+import no.ntnu.mmfplanner.ui.action.OpenHPAgileAction;
 import no.ntnu.mmfplanner.ui.action.OpenJiraAction;
+import no.ntnu.mmfplanner.ui.action.OpenVersionOneAction;
 
 public class ImportDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private JButton btnClose;
-	private JLabel hpLogoLabel;
-	private JLabel versionOneLogoLabel;
+	private JButton hpLogoButton;
+	private JButton versionOneLogoButton;
 	private JButton jiraLogoButton;
 
 	public ImportDialog(java.awt.Frame parent, boolean modal) {
@@ -31,9 +37,9 @@ public class ImportDialog extends javax.swing.JDialog {
 	private void initComponents() {
 
 		btnClose = new JButton("Close");
-		hpLogoLabel = new JLabel("HP Agile Manager");
-		versionOneLogoLabel = new JLabel("Version One");
-		jiraLogoButton = new JButton();
+		hpLogoButton = new JButton(new OpenHPAgileAction((MainFrame) this.getParent()));
+		versionOneLogoButton = new JButton(new OpenVersionOneAction((MainFrame) this.getParent()));
+		jiraLogoButton = new JButton(new OpenJiraAction((MainFrame) this.getParent()));
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle("Import");
@@ -60,10 +66,10 @@ public class ImportDialog extends javax.swing.JDialog {
 										.addGroup(
 												groupLayout
 														.createParallelGroup(Alignment.TRAILING)
-														.addComponent(versionOneLogoLabel, Alignment.LEADING,
+														.addComponent(versionOneLogoButton, Alignment.LEADING,
 																GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
 																Short.MAX_VALUE)
-														.addComponent(hpLogoLabel, Alignment.LEADING,
+														.addComponent(hpLogoButton, Alignment.LEADING,
 																GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)))
 						.addGap(251).addComponent(btnClose, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
 						.addContainerGap()));
@@ -77,20 +83,20 @@ public class ImportDialog extends javax.swing.JDialog {
 						groupLayout
 								.createSequentialGroup()
 								.addGap(29)
-								.addComponent(hpLogoLabel, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+								.addComponent(hpLogoButton, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addGroup(
 										groupLayout
 												.createSequentialGroup()
-												.addComponent(versionOneLogoLabel, GroupLayout.PREFERRED_SIZE, 62,
+												.addComponent(versionOneLogoButton, GroupLayout.PREFERRED_SIZE, 62,
 														GroupLayout.PREFERRED_SIZE)
 												.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
 														Short.MAX_VALUE)
 												.addComponent(jiraLogoButton, GroupLayout.PREFERRED_SIZE, 86,
 														GroupLayout.PREFERRED_SIZE)).addGap(29)));
-		groupLayout.linkSize(SwingConstants.VERTICAL, new Component[] { hpLogoLabel, versionOneLogoLabel,
+		groupLayout.linkSize(SwingConstants.VERTICAL, new Component[] { hpLogoButton, versionOneLogoButton,
 				jiraLogoButton });
-		groupLayout.linkSize(SwingConstants.HORIZONTAL, new Component[] { hpLogoLabel, versionOneLogoLabel,
+		groupLayout.linkSize(SwingConstants.HORIZONTAL, new Component[] { hpLogoButton, versionOneLogoButton,
 				jiraLogoButton });
 		getContentPane().setLayout(groupLayout);
 
@@ -98,24 +104,6 @@ public class ImportDialog extends javax.swing.JDialog {
 	}
 
 	private void postInitComponents() {
-		URL jiraLogo = getClass().getClassLoader().getResource("jira.png");
-		if (jiraLogo != null) {
-			this.jiraLogoButton.setIcon(new ImageIcon(new ImageIcon(jiraLogo).getImage().getScaledInstance(165, 75,
-					Image.SCALE_SMOOTH)));
-			//this.jiraLogoButton.setAction(new OpenJiraAction((MainFrame) this.getParent()));
-		}
-
-		URL versionOneLogo = getClass().getClassLoader().getResource("version_one.png");
-		if (versionOneLogo != null) {
-			this.versionOneLogoLabel.setIcon(new ImageIcon(new ImageIcon(versionOneLogo).getImage().getScaledInstance(
-					125, 65, Image.SCALE_SMOOTH)));
-		}
-
-		URL hpAgileManagerLogo = getClass().getClassLoader().getResource("hp_agile_manager.png");
-		if (hpAgileManagerLogo != null) {
-			this.hpLogoLabel.setIcon(new ImageIcon(new ImageIcon(hpAgileManagerLogo).getImage().getScaledInstance(80,
-					80, Image.SCALE_SMOOTH)));
-		}
 	}
 
 	private void closeButtonAction(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_closeButtonAction
