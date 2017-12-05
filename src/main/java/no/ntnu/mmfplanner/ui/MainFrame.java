@@ -31,6 +31,7 @@ import no.ntnu.mmfplanner.ui.action.DeleteCategoryAction;
 import no.ntnu.mmfplanner.ui.action.DeleteMmfAction;
 import no.ntnu.mmfplanner.ui.action.HeuristicSortAction;
 import no.ntnu.mmfplanner.ui.action.HideTabAction;
+import no.ntnu.mmfplanner.ui.action.ImportAction;
 import no.ntnu.mmfplanner.ui.action.LoadTestProjectAction;
 import no.ntnu.mmfplanner.ui.action.MoveTabAction;
 import no.ntnu.mmfplanner.ui.action.NewCategoryAction;
@@ -292,6 +293,7 @@ public class MainFrame extends JFrame {
         categoryDeleteMenuItem.setAction(new DeleteCategoryAction(this));
         mmfDeleteMenuItem.setAction(new DeleteMmfAction(this));
         fileNewProjectMenuItem.setAction(new NewProjectAction(this));
+        fileImportProjectMenuItem.setAction(new ImportAction(this));
         fileSaveProjectMenuItem.setAction(new SaveProjectAction(this));
         fileOpenProjectMenuItem.setAction(new OpenProjectAction(this));
         fileLoadTestDataMenuItem.setAction(new LoadTestProjectAction(this));
@@ -454,6 +456,7 @@ public class MainFrame extends JFrame {
         fileOpenProjectMenuItem = new javax.swing.JMenuItem();
         fileSeparator3 = new javax.swing.JSeparator();
         fileLoadTestDataMenuItem = new javax.swing.JMenuItem();
+        fileImportProjectMenuItem = new javax.swing.JMenuItem();
         fileSaveProjectMenuItem = new javax.swing.JMenuItem();
         fileSeparator2 = new javax.swing.JSeparator();
         fileExitMenuItem = new javax.swing.JMenuItem();
@@ -802,6 +805,7 @@ public class MainFrame extends JFrame {
         fileMenu.add(fileSeparator1);
         fileMenu.add(fileOpenProjectMenuItem);
         fileMenu.add(fileSeparator3);
+        fileMenu.add(fileImportProjectMenuItem);
         fileMenu.add(fileLoadTestDataMenuItem);
         fileMenu.add(fileSaveProjectMenuItem);
         fileMenu.add(fileSeparator2);
@@ -882,7 +886,7 @@ public class MainFrame extends JFrame {
     private void helpAboutAction(java.awt.event.ActionEvent evt) {
         new AboutDialog(this, true).setVisible(true);
     }
-
+    
     private javax.swing.JComboBox categoryComboBox;
     private javax.swing.JMenuItem categoryDeleteMenuItem;
     private javax.swing.JLabel categoryLabel;
@@ -898,6 +902,7 @@ public class MainFrame extends JFrame {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem fileNewProjectMenuItem;
     private javax.swing.JMenuItem fileOpenProjectMenuItem;
+    private javax.swing.JMenuItem fileImportProjectMenuItem;
     private javax.swing.JMenuItem fileSaveProjectMenuItem;
     private javax.swing.JSeparator fileSeparator1;
     private javax.swing.JSeparator fileSeparator2;
