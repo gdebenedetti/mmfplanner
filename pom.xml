@@ -2,19 +2,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>no.ntnu</groupId>
 	<artifactId>mmfplanner</artifactId>
 	<version>1.1.2-SNAPSHOT</version>
-	
+
 	<packaging>jar</packaging>
-	
+
 	<name>MMF Planner</name>
 	<description>MMF Planner is a project planning tool for projects using the Incremental Funding Method (IFM).</description>
-	<!--
-		"url" is used for "codebase" in generated JNLP files, unless we
-		provide our own JNLP file template
-	-->
+	<!-- "url" is used for "codebase" in generated JNLP files, unless we provide 
+		our own JNLP file template -->
 	<url>https://github.com/jodal/mmfplanner/raw/master/dist/</url>
 
 	<organization>
@@ -24,12 +22,15 @@
 
 	<repositories>
 		<repository>
-			<!--
-				May be removed if piccolo and piccolox are made available through
-				other Maven repositories.
-			-->
+			<!-- May be removed if piccolo and piccolox are made available through 
+				other Maven repositories. -->
 			<id>mmfplanner.repo.lib</id>
 			<url>file://${basedir}/repo</url>
+		</repository>
+		<repository>
+			<id>maven-restlet</id>
+			<name>Restlet repository</name>
+			<url>https://maven.restlet.com</url>
 		</repository>
 	</repositories>
 
@@ -61,19 +62,15 @@
 			<version>1.0.7</version>
 		</dependency>
 		<dependency>
-			<!--
-				Transitive dependency through jfreechart, but added explicitly to
-				include it in the JNLP packaging.
-			-->
+			<!-- Transitive dependency through jfreechart, but added explicitly to 
+				include it in the JNLP packaging. -->
 			<groupId>jfree</groupId>
 			<artifactId>jcommon</artifactId>
 			<version>1.0.12</version>
 		</dependency>
 		<dependency>
-			<!--
-				Transitive dependency through xom, but added explicitly to
-				include it in the JNLP packaging.
-			-->
+			<!-- Transitive dependency through xom, but added explicitly to include 
+				it in the JNLP packaging. -->
 			<groupId>jaxen</groupId>
 			<artifactId>jaxen</artifactId>
 			<version>1.1-beta-8</version>
@@ -83,6 +80,21 @@
 			<artifactId>xmlParserAPIs</artifactId>
 			<version>2.6.2</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet</artifactId>
+			<version>2.3.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.jackson</artifactId>
+			<version>2.3.12</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20171018</version>
 		</dependency>
 	</dependencies>
 
@@ -94,10 +106,8 @@
 	<build>
 		<plugins>
 			<plugin>
-				<!--
-					If source/target requirement are increased from 1.5 to 1.6, it
-					should be possible to remove the swing-layout dependency.
-				-->
+				<!-- If source/target requirement are increased from 1.5 to 1.6, it should 
+					be possible to remove the swing-layout dependency. -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
@@ -115,10 +125,8 @@
 			</plugin>
 
 			<plugin>
-				<!--
-					Create a complete Jar file with all dependencies which may be
-					executed as simple as `java -jar path/to/mmfplanner.jar`.
-				-->
+				<!-- Create a complete Jar file with all dependencies which may be executed 
+					as simple as `java -jar path/to/mmfplanner.jar`. -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 
@@ -145,11 +153,9 @@
 			</plugin>
 
 			<plugin>
-				<!--
-					Create folder/Zip file with a ready JNLP file and all dependencies
-					needed, everything signed by a generated throw-away certificate.
-					May be used by executing `javaws path/to/mmfplanner.jnlp`.
-				-->
+				<!-- Create folder/Zip file with a ready JNLP file and all dependencies 
+					needed, everything signed by a generated throw-away certificate. May be used 
+					by executing `javaws path/to/mmfplanner.jnlp`. -->
 				<groupId>org.codehaus.mojo.webstart</groupId>
 				<artifactId>webstart-maven-plugin</artifactId>
 				<executions>
