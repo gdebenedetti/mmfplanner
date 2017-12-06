@@ -41,6 +41,7 @@ import no.ntnu.mmfplanner.ui.action.OpenProjectAction;
 import no.ntnu.mmfplanner.ui.action.OptimalSortAction;
 import no.ntnu.mmfplanner.ui.action.PrecursorSortAction;
 import no.ntnu.mmfplanner.ui.action.SaveProjectAction;
+import no.ntnu.mmfplanner.ui.action.SaveProjectRemotellyAction;
 import no.ntnu.mmfplanner.ui.action.SwimlaneSortAction;
 import no.ntnu.mmfplanner.ui.graph.GraphCanvas;
 import no.ntnu.mmfplanner.ui.graph.NpvChart;
@@ -295,6 +296,7 @@ public class MainFrame extends JFrame {
         fileNewProjectMenuItem.setAction(new NewProjectAction(this));
         fileImportProjectMenuItem.setAction(new ImportAction(this));
         fileSaveProjectMenuItem.setAction(new SaveProjectAction(this));
+        fileSaveProjectRemotelyMenuItem.setAction(new SaveProjectRemotellyAction(this));
         fileOpenProjectMenuItem.setAction(new OpenProjectAction(this));
         fileLoadTestDataMenuItem.setAction(new LoadTestProjectAction(this));
         editNewMmfMenuItem.setAction(new NewMmfAction(this));
@@ -458,6 +460,7 @@ public class MainFrame extends JFrame {
         fileLoadTestDataMenuItem = new javax.swing.JMenuItem();
         fileImportProjectMenuItem = new javax.swing.JMenuItem();
         fileSaveProjectMenuItem = new javax.swing.JMenuItem();
+        fileSaveProjectRemotelyMenuItem = new javax.swing.JMenuItem();
         fileSeparator2 = new javax.swing.JSeparator();
         fileExitMenuItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
@@ -808,6 +811,7 @@ public class MainFrame extends JFrame {
         fileMenu.add(fileImportProjectMenuItem);
         fileMenu.add(fileLoadTestDataMenuItem);
         fileMenu.add(fileSaveProjectMenuItem);
+        fileMenu.add(fileSaveProjectRemotelyMenuItem);
         fileMenu.add(fileSeparator2);
 
         fileExitMenuItem.setMnemonic('x');
@@ -904,6 +908,7 @@ public class MainFrame extends JFrame {
     private javax.swing.JMenuItem fileOpenProjectMenuItem;
     private javax.swing.JMenuItem fileImportProjectMenuItem;
     private javax.swing.JMenuItem fileSaveProjectMenuItem;
+    private javax.swing.JMenuItem fileSaveProjectRemotelyMenuItem;
     private javax.swing.JSeparator fileSeparator1;
     private javax.swing.JSeparator fileSeparator2;
     private javax.swing.JSeparator fileSeparator3;

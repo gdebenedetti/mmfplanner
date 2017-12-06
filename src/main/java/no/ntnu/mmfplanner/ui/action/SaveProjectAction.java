@@ -31,7 +31,7 @@ public class SaveProjectAction extends MainAbstractAction {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String ACTION_NAME = "Save Project...";
+    public static final String ACTION_NAME = "Save Project locally...";
 
     public static final int ACTION_MNEMONIC = KeyEvent.VK_S;
 
