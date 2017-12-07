@@ -9,10 +9,17 @@
 
 package no.ntnu.mmfplanner.ui.action;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 import no.ntnu.mmfplanner.ui.MainFrame;
 import no.ntnu.mmfplanner.util.XmlSerializer;
@@ -56,26 +63,55 @@ public class SaveProjectRemotellyAction extends MainAbstractAction {
 
 	public boolean save() {
 
-		ClientResource clientJSON = new ClientResource(
-				"https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsJSON?apiKey=r5Kh17D7-6KVNy70vxx-aY20h7_2Pb4Q");
+		final JDialog d = new JDialog();
+		JPanel p1 = new JPanel(new GridBagLayout());
+		p1.add(new JLabel("Please Wait..."), new GridBagConstraints());
+		d.getContentPane().add(p1);
+		d.setSize(100, 100);
+		d.setLocationRelativeTo(mainFrame);
+		d.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		d.setModal(true);
 
-		// ClientResource clientXML = new ClientResource(
-		// "https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsXML?apiKey=r5Kh17D7-6KVNy70vxx-aY20h7_2Pb4Q");
+		SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
+			protected Void doInBackground() throws InterruptedException {
 
-		Document document = XmlSerializer.workspaceToDocument(mainFrame.getTabPanePanelPlacement(),
-				mainFrame.getProject());
+				ClientResource clientJSON = new ClientResource(
+						"https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsJSON?apiKey=r5Kh17D7-6KVNy70vxx-aY20h7_2Pb4Q");
 
-		Element root = document.getRootElement();
+				// ClientResource clientXML = new ClientResource(
+				// "https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsXML?apiKey=r5Kh17D7-6KVNy70vxx-aY20h7_2Pb4Q");
 
-		JSONObject json = XML.toJSONObject(root.toXML());
+				Document document = XmlSerializer.workspaceToDocument(mainFrame.getTabPanePanelPlacement(),
+						mainFrame.getProject());
 
-		StringRepresentation stringRep = new StringRepresentation(json.toString());
-		stringRep.setMediaType(MediaType.APPLICATION_JSON);
+				Element root = document.getRootElement();
 
-		clientJSON.setMethod(Method.POST);
-		clientJSON.getReference().addQueryParameter("format", "json");
-		clientJSON.post(stringRep, MediaType.APPLICATION_JSON);
+				JSONObject json = XML.toJSONObject(root.toXML());
 
-		return clientJSON.getStatus().isSuccess();
+				StringRepresentation stringRep = new StringRepresentation(json.toString());
+				stringRep.setMediaType(MediaType.APPLICATION_JSON);
+
+				clientJSON.setMethod(Method.POST);
+				clientJSON.getReference().addQueryParameter("format", "json");
+				clientJSON.post(stringRep, MediaType.APPLICATION_JSON);
+
+				if (!clientJSON.getStatus().isSuccess()) {
+					// TODO
+				}
+
+				return null;
+			}
+
+			protected void process(List<Integer> chunks) {
+			}
+
+			protected void done() {
+				d.dispose();
+			}
+		};
+		worker.execute();
+		d.setVisible(true);
+
+		return true;
 	}
 }
