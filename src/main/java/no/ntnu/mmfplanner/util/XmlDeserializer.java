@@ -148,7 +148,7 @@ public class XmlDeserializer {
 
     public static Mmf elementToMmf(Project project, Element e)
             throws MmfException {
-        Mmf mmf = new Mmf(e.getAttributeValue("id"), getTextNode(e, "name"));
+        Mmf mmf = new Mmf(getTextNode(e, "id"), getTextNode(e, "name"));
         mmf.setProject(project);
         mmf.setPeriod(getIntNode(e, "period"));
         mmf.setLocked(getBoolNode(e, "locked"));

@@ -242,7 +242,7 @@ public class Mmf {
     }
 
     /**
-     * Sets all the precurors
+     * Sets all the precursors
      * 
      * @param prestring
      */
