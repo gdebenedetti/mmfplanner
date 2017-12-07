@@ -61,6 +61,11 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent e) {
+		boolean cancel = mainFrame.queryProjectCloseSave();
+		if (cancel) {
+			return;
+		}
+
 		if (!loadProjectsRemotely()) {
 			JOptionPane.showMessageDialog(mainFrame, "Failed to load projects remotely.", "Fail!",
 					JOptionPane.WARNING_MESSAGE);
