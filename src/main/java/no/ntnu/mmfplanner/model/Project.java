@@ -32,6 +32,7 @@ public class Project implements PropertyChangeListener {
     public static final String EVENT_MMFS = "project.mmfs";
     public static final String EVENT_MAX_MMFS = "project.maxMMFs";
 
+    private String id;
     private String name;
     private int periods;
     private double interestRate;
@@ -55,8 +56,16 @@ public class Project implements PropertyChangeListener {
         this.maxMmfsPerPeriod = 1;
         this.changeSupport = new PropertyChangeSupport(this);
     }
+    
+    public String getId() {
+		return id;
+	}
 
-    public String getName() {
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
         return name;
     }
 

@@ -175,7 +175,9 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 								// TODO
 							}
 
-							// remove _id
+							// get and remove _id
+							String id = stringWriter.toString().substring(stringWriter.toString().indexOf("oid") + 8,
+									stringWriter.toString().indexOf("} ,") - 1);
 							JSONObject project = new JSONObject("{"
 									+ stringWriter.toString().substring(stringWriter.toString().indexOf(',') + 1));
 							String xml = XML.toString(project);
@@ -184,6 +186,7 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 							try {
 								InputStream stream = new ByteArrayInputStream(xml.getBytes(Charset.forName("UTF-8")));
 								Project p = XmlDeserializer.readProject(stream);
+								p.setId(id);
 								mainFrame.setModel(p);
 							} catch (MmfException | IOException | ParsingException e1) {
 								// TODO Auto-generated catch block

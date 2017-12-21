@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Parameter;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
@@ -40,13 +41,13 @@ public class SaveProjectRemotellyAction extends MainAbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String ACTION_NAME = "Save Project remotelly...";
+	public static final String ACTION_NAME = "Save or update Project remotelly...";
 
 	public static final int ACTION_MNEMONIC = KeyEvent.VK_S;
 
 	public static final String ACTION_ACCELERATOR = "ctrl S";
 
-	public static final String ACTION_DESCRIPTION = "Save the current project";
+	public static final String ACTION_DESCRIPTION = "Save or update the current project";
 
 	public SaveProjectRemotellyAction(MainFrame mainFrame) {
 		super(mainFrame, ACTION_NAME, ACTION_MNEMONIC, ACTION_ACCELERATOR, ACTION_DESCRIPTION);
@@ -54,9 +55,9 @@ public class SaveProjectRemotellyAction extends MainAbstractAction {
 
 	public void actionPerformed(ActionEvent evt) {
 		if (save()) {
-			JOptionPane.showMessageDialog(mainFrame, "Project remotely saved successfully.");
+			JOptionPane.showMessageDialog(mainFrame, "Project remotely saved or updated successfully.");
 		} else {
-			JOptionPane.showMessageDialog(mainFrame, "Failed to save the project remotely.", "Fail!",
+			JOptionPane.showMessageDialog(mainFrame, "Failed to save or update the project remotely.", "Fail!",
 					JOptionPane.WARNING_MESSAGE);
 		}
 	}
@@ -75,12 +76,6 @@ public class SaveProjectRemotellyAction extends MainAbstractAction {
 		SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
 			protected Void doInBackground() throws InterruptedException {
 
-				ClientResource clientJSON = new ClientResource(
-						"https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsJSON?apiKey=r5Kh17D7-6KVNy70vxx-aY20h7_2Pb4Q");
-
-				// ClientResource clientXML = new ClientResource(
-				// "https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsXML?apiKey=r5Kh17D7-6KVNy70vxx-aY20h7_2Pb4Q");
-
 				Document document = XmlSerializer.workspaceToDocument(mainFrame.getTabPanePanelPlacement(),
 						mainFrame.getProject());
 
@@ -91,9 +86,27 @@ public class SaveProjectRemotellyAction extends MainAbstractAction {
 				StringRepresentation stringRep = new StringRepresentation(json.toString());
 				stringRep.setMediaType(MediaType.APPLICATION_JSON);
 
-				clientJSON.setMethod(Method.POST);
+				String URL = "https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsJSON/";
+
+				// Save or Update
+				if (!"".equals(mainFrame.getProject().getId())) {
+					URL = URL + mainFrame.getProject().getId();
+				}
+				
+				ClientResource clientJSON = new ClientResource(URL);
+
+				Parameter apiKey = new Parameter("apiKey", "r5Kh17D7-6KVNy70vxx-aY20h7_2Pb4Q");
+				clientJSON.addQueryParameter(apiKey); 
 				clientJSON.getReference().addQueryParameter("format", "json");
-				clientJSON.post(stringRep, MediaType.APPLICATION_JSON);
+				
+				// Save or Update
+				if ("".equals(mainFrame.getProject().getId())) {
+					clientJSON.setMethod(Method.POST);
+					clientJSON.post(stringRep, MediaType.APPLICATION_JSON);
+				} else {
+					clientJSON.setMethod(Method.PUT);
+					clientJSON.put(stringRep, MediaType.APPLICATION_JSON);
+				}
 
 				if (!clientJSON.getStatus().isSuccess()) {
 					// TODO
