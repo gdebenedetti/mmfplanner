@@ -11,18 +11,12 @@ package no.ntnu.mmfplanner.ui.action;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URL;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 
+import no.ntnu.mmfplanner.ui.ImportJiraDialog;
 import no.ntnu.mmfplanner.ui.MainFrame;
 
 /**
@@ -55,29 +49,21 @@ public class OpenJiraAction extends MainAbstractAction {
 			return;
 		}
 
-		// show a file chooser
-		JFileChooser fc = new JFileChooser();
-		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fc.setDialogType(JFileChooser.OPEN_DIALOG);
-		fc.setMultiSelectionEnabled(false);
-		fc.setAcceptAllFileFilterUsed(true);
-		FileFilter filter = new JiraFileFilter();
-		fc.addChoosableFileFilter(filter);
-		if (JFileChooser.APPROVE_OPTION != fc.showOpenDialog(mainFrame)) {
-			return;
-		}
-
-		try {
-			// serialize and write to file
-			File file = fc.getSelectedFile();
-			InputStream is = new BufferedInputStream(new FileInputStream(file));
-			// TODO Read Jira File
-			// Project project = XmlDeserializer.readProject(mainFrame.getTabPanePanelPlacement(), is);
-			// mainFrame.setModel(project);
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(mainFrame, "An error occured while opening Jira project:\n" + e, "Error",
-					JOptionPane.ERROR_MESSAGE);
-		}
+		ImportJiraDialog importJiraDialog = new ImportJiraDialog(mainFrame, true);
+		importJiraDialog.setVisible(true);
+		/*
+		 * // show a file chooser JFileChooser fc = new JFileChooser();
+		 * fc.setFileSelectionMode(JFileChooser.FILES_ONLY); fc.setDialogType(JFileChooser.OPEN_DIALOG);
+		 * fc.setMultiSelectionEnabled(false); fc.setAcceptAllFileFilterUsed(true); FileFilter filter = new
+		 * JiraFileFilter(); fc.addChoosableFileFilter(filter); if (JFileChooser.APPROVE_OPTION !=
+		 * fc.showOpenDialog(mainFrame)) { return; }
+		 * 
+		 * try { // serialize and write to file File file = fc.getSelectedFile(); InputStream is = new
+		 * BufferedInputStream(new FileInputStream(file)); // TODO Read Jira File // Project project =
+		 * XmlDeserializer.readProject(mainFrame.getTabPanePanelPlacement(), is); //
+		 * mainFrame.setModel(project); } catch (Exception e) { e.printStackTrace();
+		 * JOptionPane.showMessageDialog(mainFrame, "An error occured while opening Jira project:\n" + e,
+		 * "Error", JOptionPane.ERROR_MESSAGE); }
+		 */
 	}
 }
