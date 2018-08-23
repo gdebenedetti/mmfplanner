@@ -9,15 +9,21 @@
 package no.ntnu.mmfplanner.ui;
 
 import java.awt.Component;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.net.URL;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 
 import no.ntnu.mmfplanner.ui.action.OpenHPAgileAction;
-import no.ntnu.mmfplanner.ui.action.OpenJiraAction;
 import no.ntnu.mmfplanner.ui.action.OpenVersionOneAction;
 
 public class ImportDialog extends javax.swing.JDialog {
@@ -39,7 +45,30 @@ public class ImportDialog extends javax.swing.JDialog {
 		btnClose = new JButton("Close");
 		hpLogoButton = new JButton(new OpenHPAgileAction((MainFrame) this.getParent()));
 		versionOneLogoButton = new JButton(new OpenVersionOneAction((MainFrame) this.getParent()));
-		jiraLogoButton = new JButton(new OpenJiraAction((MainFrame) this.getParent()));
+
+		// jiraLogoButton = new JButton(new OpenJiraAction((MainFrame) this.getParent()));
+		jiraLogoButton = new JButton();
+		URL jiraLogo = getClass().getClassLoader().getResource("jira.png");
+		if (jiraLogo != null) {
+			jiraLogoButton.setIcon(new ImageIcon(new ImageIcon(jiraLogo).getImage().getScaledInstance(165, 75,
+					Image.SCALE_SMOOTH)));
+		}
+		jiraLogoButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				ImportJiraDialog importJiraDialog = new ImportJiraDialog((MainFrame) getParent(), true);
+				importJiraDialog.setLocationRelativeTo(jiraLogoButton);
+				importJiraDialog.setModal(true);
+				importJiraDialog.pack();
+				importJiraDialog.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosed(WindowEvent arg0) {
+						closeButtonAction(null);
+					};
+				});
+				importJiraDialog.setVisible(true);
+			}
+		});
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle("Import");
