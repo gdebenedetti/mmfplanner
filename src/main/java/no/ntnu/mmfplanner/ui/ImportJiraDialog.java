@@ -111,7 +111,8 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 
 				if (backlog != null) {
 					// load ok del backlog en Jira
-					// TODO a procesar la transformacion Backlog2IFM
+					TransformJiraDialog transformJiraDialog = new TransformJiraDialog(mainFrame, true, backlog);
+					transformJiraDialog.setVisible(true);
 				}
 
 				closeButtonAction(evt);
