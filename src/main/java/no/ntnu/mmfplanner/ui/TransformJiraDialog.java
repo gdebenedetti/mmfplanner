@@ -2,19 +2,27 @@ package no.ntnu.mmfplanner.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTree;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import net.rcarz.jiraclient.greenhopper.Backlog;
-import net.rcarz.jiraclient.greenhopper.Epic;
-import net.rcarz.jiraclient.greenhopper.SprintIssue;
+import no.ntnu.mmfplanner.jira.model.Board;
+import no.ntnu.mmfplanner.jira.model.Epic;
+import no.ntnu.mmfplanner.model.Mmf;
+import no.ntnu.mmfplanner.model.Project;
 import no.ntnu.mmfplanner.ui.model.CheckBoxNodeData;
 import no.ntnu.mmfplanner.ui.renderer.CheckBoxNodeRenderer;
 
@@ -23,61 +31,144 @@ public class TransformJiraDialog extends JDialog {
 	private static final long serialVersionUID = 868016866061428678L;
 
 	private MainFrame mainFrame;
-	private Backlog backlog;
+	private Board board;
+	private String nextId;
+	private List<String> mmFsIDs;
 
-	public TransformJiraDialog(Frame parent, boolean modal, Backlog backlog) {
+	public TransformJiraDialog(Frame parent, boolean modal, Board board) {
 		super(parent, modal);
 		this.mainFrame = (MainFrame) parent;
-		this.backlog = backlog;
+		this.board = board;
+		this.nextId = "A";
+		this.mmFsIDs = new ArrayList<String>();
 		initComponents();
-		postInitComponents();
 	}
 
 	private void initComponents() {
-		final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Board");
+		final DefaultMutableTreeNode rootBoard = new DefaultMutableTreeNode("Board");
+		final DefaultMutableTreeNode rootMMFs = new DefaultMutableTreeNode("MMFs");
 
-		final DefaultMutableTreeNode epics = add(root, "Epics (" + backlog.getEpics().size() + ")", true);
-		for (Epic epic : backlog.getEpics()) {
-			add(epics, epic.getEpicLabel() + " (" + epic.getKey() + " / " + epic.getEstimateStatistic().getFieldValue()
-					+ ")", false);
+		// TODO
+		// https://confluence.atlassian.com/jirakb/retrieve-user-stories-under-the-epic-via-rest-call-779158635.html
+
+		final CheckBoxNodeData data = new CheckBoxNodeData("Epics (" + board.getEpics().size() + ")", true);
+		final DefaultMutableTreeNode epics = new DefaultMutableTreeNode(data);
+
+		for (Epic epic : board.getEpics()) {
+			final CheckBoxNodeData epicData = new CheckBoxNodeData(epic.getName() + " (" + epic.getKey() + ")", false);
+			final DefaultMutableTreeNode epicNode = new DefaultMutableTreeNode(epicData);
+			epics.add(epicNode);
+
+			// for (Issue issue : epic.getIssues()) {
+			// final CheckBoxNodeData issueData = new CheckBoxNodeData(issue.getName() + " (" + issue.getKey()
+			// + ")"
+			// + " (" + issue.getOriginalEstimate() + ")", false);
+			// final DefaultMutableTreeNode issueNode = new DefaultMutableTreeNode(issueData);
+			// epicNode.add(issueNode);
+			// }
 		}
-		root.add(epics);
+		rootBoard.add(epics);
 
-		final DefaultMutableTreeNode issues = add(root, "Issues (" + backlog.getIssues().size() + ")", true);
-		for (SprintIssue issue : backlog.getIssues()) {
-			add(issues, issue.getSummary() + " (" + issue.getEpic() + ")", false);
-		}
-		root.add(issues);
-
-		final DefaultTreeModel treeModel = new DefaultTreeModel(root);
-		final JTree tree = new JTree(treeModel);
+		final DefaultTreeModel boardTreeModel = new DefaultTreeModel(rootBoard);
+		final JTree epicsTree = new JTree(boardTreeModel);
+		final DefaultTreeModel mmfsTreeModel = new DefaultTreeModel(rootMMFs);
+		final JTree mmfsTree = new JTree(mmfsTreeModel);
 
 		final CheckBoxNodeRenderer renderer = new CheckBoxNodeRenderer();
-		tree.setCellRenderer(renderer);
+		epicsTree.setCellRenderer(renderer);
 
-		final CheckBoxNodeEditor editor = new CheckBoxNodeEditor(tree);
-		tree.setCellEditor(editor);
-		tree.setEditable(true);
-		tree.setVisibleRowCount(root.getLeafCount());
-		tree.expandPath(new TreePath(epics.getPath()));
+		final CheckBoxNodeEditor editor = new CheckBoxNodeEditor(epicsTree);
+		epicsTree.setCellEditor(editor);
+		epicsTree.setEditable(true);
+		epicsTree.setVisibleRowCount(rootBoard.getLeafCount());
+		epicsTree.expandPath(new TreePath(epics.getPath()));
 
-		// listen for changes in the selection
-		tree.addTreeSelectionListener(new TreeSelectionListener() {
+		final JScrollPane leftScrollPane = new JScrollPane(epicsTree);
+		final JPanel middlePanel = new JPanel();
+		middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.Y_AXIS));
+		final JButton transformButton = new JButton("Transform >>>");
+		final JButton finishButton = new JButton("Finish");
+		transformButton.addActionListener(new ActionListener() {
 			@Override
-			public void valueChanged(final TreeSelectionEvent e) {
-				DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-				CheckBoxNodeData data = (CheckBoxNodeData) selectedNode.getUserObject();
-				System.out.println(data.getText() + ": selected / Checked: " + data.isChecked());
+			public void actionPerformed(ActionEvent e) {
+				DefaultMutableTreeNode mmfNode = null;
+				boolean newMMF = true;
+				int childCount = epics.getChildCount();
+				for (int i = 0; i < childCount; i++) {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) epics.getChildAt(i);
+					if (isChecked(node)) {
+						if (newMMF) {
+							// nuevo MMF? Si: creo MMF padre
+							String mmfID = getNextId();
+							mmFsIDs.add(mmfID);
+							mmfNode = new DefaultMutableTreeNode("MMF " + mmfID);
+							mmfNode.add(new DefaultMutableTreeNode(((CheckBoxNodeData) getData(node)).getText()));
+							rootMMFs.add(mmfNode);
+							newMMF = false;
+						} else {
+							// sino agrego al MMF ya creado
+							mmfNode.add(new DefaultMutableTreeNode(((CheckBoxNodeData) getData(node)).getText()));
+						}
+					}
+				}
+				mmfsTreeModel.reload();
+				uncheckAllNodes(rootBoard);
+				boardTreeModel.reload();
+				expandAllNodes(epicsTree, 0, epicsTree.getRowCount());
+				expandAllNodes(mmfsTree, 0, mmfsTree.getRowCount());
+			}
+		});
+		finishButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO crear proyecto y pasarlo al mainframe
+				Project project = new Project("JIRA_2_IFM", 6, 0.1, 1);
+
+				// Creo las MMFs
+				int childCount = rootMMFs.getChildCount();
+				for (int i = 0; i < childCount; i++) {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) rootMMFs.getChildAt(i);
+
+					// itero las épicas
+					StringBuilder mmfName = new StringBuilder();
+					for (int j = 0; j < node.getChildCount(); j++) {
+						DefaultMutableTreeNode epic = (DefaultMutableTreeNode) node.getChildAt(j);
+						mmfName.append(epic.toString());
+						if (j < node.getChildCount() - 1)
+							mmfName.append(" | ");
+					}
+
+					Mmf mmf = new Mmf(null, mmfName.toString());
+					project.add(mmf);
+				}
+
+				mainFrame.setModel(project);
+				closeButtonAction(null);
 			}
 		});
 
-		final JScrollPane scrollPane = new JScrollPane(tree);
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
+		middlePanel.add(transformButton);
+		middlePanel.add(finishButton);
+		final JScrollPane rightScrollPane = new JScrollPane(mmfsTree);
+
+		JSplitPane splitPane1 = new JSplitPane();
+		splitPane1.setOneTouchExpandable(true);
+		splitPane1.setDividerLocation(250);
+		JSplitPane splitPane2 = new JSplitPane();
+		splitPane2.setOneTouchExpandable(true);
+		splitPane2.setDividerLocation(150);
+
+		splitPane1.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane1.setRightComponent(splitPane2);
+		splitPane1.setLeftComponent(leftScrollPane);
+		splitPane2.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane2.setRightComponent(rightScrollPane);
+		splitPane2.setLeftComponent(middlePanel);
+
+		getContentPane().add(splitPane1, BorderLayout.CENTER);
 
 		pack();
-	}
-
-	private void postInitComponents() {
 	}
 
 	// backlog.getEpics();
@@ -107,4 +198,72 @@ public class TransformJiraDialog extends JDialog {
 		return node;
 	}
 
+	private CheckBoxNodeData getData(final DefaultMutableTreeNode node) {
+		final Object userObject = node.getUserObject();
+		if (!(userObject instanceof CheckBoxNodeData))
+			return null;
+		return (CheckBoxNodeData) userObject;
+	}
+
+	/** Extracts the check box state of a given tree node. */
+	private boolean isChecked(final DefaultMutableTreeNode node) {
+		final CheckBoxNodeData data = getData(node);
+		if (data == null)
+			return false;
+		return data.isChecked();
+	}
+
+	private void unCheck(final DefaultMutableTreeNode node) {
+		final CheckBoxNodeData data = getData(node);
+		if (data == null)
+			return;
+		data.setChecked(false);
+	}
+
+	private boolean isValidId(String id) {
+		return (null != id) && id.matches("Z*[A-Y]") && (!mmFsIDs.contains(id));
+	}
+
+	private String getNextId() {
+		// check if next id is correct.
+		while (!isValidId(nextId)) {
+			// find next id value
+			char nextChar = (char) (1 + nextId.charAt(nextId.length() - 1));
+			String pre = nextId.substring(0, nextId.length() - 1);
+			nextId = pre + nextChar;
+			if (nextChar == 'Z') {
+				// We're at the last usable character in this set. We retry all
+				// previous characters
+				// in an attempt to avoid multiple characters, otherwise we add
+				// another 'A' character
+				for (int i = 0; i < 25 * 10 + 1; i++) {
+					nextId = "ZZZZZZZZZZ".substring(0, i / 25) + (char) ('A' + i % 25);
+					if (isValidId(nextId)) {
+						return nextId;
+					}
+				}
+			}
+		}
+		return nextId;
+	}
+
+	private void expandAllNodes(JTree tree, int startingIndex, int rowCount) {
+		for (int i = 0; i < tree.getRowCount(); i++) {
+			tree.expandRow(i);
+		}
+	}
+
+	private void uncheckAllNodes(DefaultMutableTreeNode root) {
+		Enumeration e = root.preorderEnumeration();
+		while (e.hasMoreElements()) {
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+			if (isChecked(node)) {
+				unCheck(node);
+			}
+		}
+	}
+
+	private void closeButtonAction(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_closeButtonAction
+		this.dispose();
+	}
 }
