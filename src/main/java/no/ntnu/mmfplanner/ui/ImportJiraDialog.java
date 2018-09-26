@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.text.NumberFormat;
+import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -23,12 +24,13 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.text.NumberFormatter;
 
-import net.rcarz.jiraclient.BasicCredentials;
 import net.rcarz.jiraclient.JiraClient;
 import net.rcarz.jiraclient.JiraException;
-import net.rcarz.jiraclient.greenhopper.Backlog;
-import net.rcarz.jiraclient.greenhopper.GreenHopperClient;
-import net.rcarz.jiraclient.greenhopper.RapidView;
+import net.rcarz.jiraclient.TokenCredentials;
+import net.rcarz.jiraclient.agile.AgileClient;
+import net.rcarz.jiraclient.agile.Epic;
+import net.rcarz.jiraclient.agile.Issue;
+import no.ntnu.mmfplanner.jira.model.Board;
 
 public class ImportJiraDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = 1L;
@@ -39,7 +41,7 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 	private JFormattedTextField txtProjectid;
 
 	private MainFrame mainFrame;
-	private Backlog backlog;
+	private Board board;
 	private JTextField textField;
 
 	public ImportJiraDialog(java.awt.Frame parent, boolean modal) {
@@ -109,9 +111,9 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 
 				loadJira();
 
-				if (backlog != null) {
+				if (board != null) {
 					// load ok del backlog en Jira
-					TransformJiraDialog transformJiraDialog = new TransformJiraDialog(mainFrame, true, backlog);
+					TransformJiraDialog transformJiraDialog = new TransformJiraDialog(mainFrame, true, board);
 					transformJiraDialog.setVisible(true);
 				}
 
@@ -416,38 +418,63 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 
 		final JDialog d = new JDialog();
 		JPanel p1 = new JPanel(new GridBagLayout());
-		p1.add(new JLabel("Please Wait..."), new GridBagConstraints());
+		p1.add(new JLabel("Loading Jira data. Please Wait..."), new GridBagConstraints());
 		d.getContentPane().add(p1);
-		d.setSize(100, 100);
+		d.setSize(300, 300);
 		d.setLocationRelativeTo(mainFrame);
 		d.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		d.setModal(true);
 
-		SwingWorker<?, ?> worker = new SwingWorker<Backlog, Void>() {
-			protected Backlog doInBackground() throws InterruptedException, JiraException {
+		SwingWorker<?, ?> worker = new SwingWorker<Board, Void>() {
+			protected Board doInBackground() throws InterruptedException, JiraException {
 
-				BasicCredentials creds = new BasicCredentials(txtUser.getText(), String.valueOf(txtPassword
+				// BasicCredentials creds = new BasicCredentials(txtUser.getText(), String.valueOf(txtPassword
+				// .getPassword()));
+				TokenCredentials tokenCredentials = new TokenCredentials(txtUser.getText(), String.valueOf(txtPassword
 						.getPassword()));
-				JiraClient jira = new JiraClient(textURL.getText(), creds);
-				GreenHopperClient gh = new GreenHopperClient(jira);
+				JiraClient jira = new JiraClient(textURL.getText(), tokenCredentials);
 
+				AgileClient ac = new AgileClient(jira);
+
+				// Configuration configuration = Configuration.get(ac.getRestclient(),
+				// ((Number) txtProjectid.getValue()).intValue());
+
+				net.rcarz.jiraclient.agile.Board agileBoard = ac
+						.getBoard(((Number) txtProjectid.getValue()).intValue());
+
+				Board board = new Board(agileBoard.getId(), agileBoard.getName(), agileBoard.getSelfURL(),
+						agileBoard.getType());
+
+				List<Epic> epics = agileBoard.getEpics();
+				for (Epic epic : epics) {
+					no.ntnu.mmfplanner.jira.model.Epic e = new no.ntnu.mmfplanner.jira.model.Epic(epic.getId(),
+							epic.getName(), epic.getKey(), epic.getSummary(), epic.isDone());
+
+					List<Issue> issues = epic.getIssues();
+					for (Issue issue : issues) {
+						no.ntnu.mmfplanner.jira.model.Issue i = new no.ntnu.mmfplanner.jira.model.Issue(issue.getId(),
+								issue.getName(), issue.getKey(), issue.getTimeTracking().getOriginalEstimate(), e);
+						e.getIssues().add(i);
+					}
+
+					board.getEpics().add(e);
+				}
+
+				// GreenHopperClient gh = new GreenHopperClient(jira);
 				// ID del proyecto Spring XD
-				RapidView board = gh.getRapidView(((Number) txtProjectid.getValue()).intValue());
+				// RapidView rapidView = gh.getRapidView(((Number) txtProjectid.getValue()).intValue());
 
 				/* Get backlog data */
-				Backlog innerBacklog = board.getBacklogData();
-				// board.getId();
-				// board.getName();
-				// board.getSprints();
+				// Backlog innerBacklog = rapidView.getBacklogData();
 
-				return innerBacklog;
+				return board;
 			}
 
 			@Override
 			public void done() {
 				d.dispose();
 				try {
-					backlog = get();
+					board = get();
 				} catch (Exception e) {
 					String why = null;
 					Throwable cause = e.getCause();
