@@ -43,6 +43,7 @@ import no.ntnu.mmfplanner.ui.action.OptimalSortAction;
 import no.ntnu.mmfplanner.ui.action.PrecursorSortAction;
 import no.ntnu.mmfplanner.ui.action.SaveProjectAction;
 import no.ntnu.mmfplanner.ui.action.SaveProjectRemotellyAction;
+import no.ntnu.mmfplanner.ui.action.SetMmfDistributionAction;
 import no.ntnu.mmfplanner.ui.action.SwimlaneSortAction;
 import no.ntnu.mmfplanner.ui.graph.GraphCanvas;
 import no.ntnu.mmfplanner.ui.graph.NpvChart;
@@ -141,6 +142,7 @@ public class MainFrame extends JFrame {
 			return false;
 		}
 
+		// / TODO add save remotelly option
 		int answer = JOptionPane.showConfirmDialog(this, "Do you want to save this project before you close it?",
 				"Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (answer == JOptionPane.YES_OPTION) {
@@ -276,6 +278,8 @@ public class MainFrame extends JFrame {
 		fileLoadProjectsRemotellyDataMenuItem.setAction(new LoadProjectsRemotelyAction(this));
 		editNewMmfMenuItem.setAction(new NewMmfAction(this));
 		editNewCategoryMenuItem.setAction(new NewCategoryAction(this));
+		editSetMmfDistributionMenuItem.setAction(new SetMmfDistributionAction(this));
+
 		sortPrettyMenuItem.setAction(new SwimlaneSortAction(this));
 		sortPrecursorMenuItem.setAction(new PrecursorSortAction(this));
 		sortGreedyMenuItem.setAction(new OptimalSortAction(this));
@@ -422,6 +426,7 @@ public class MainFrame extends JFrame {
 		fileExitMenuItem = new javax.swing.JMenuItem();
 		editMenu = new javax.swing.JMenu();
 		editNewCategoryMenuItem = new javax.swing.JMenuItem();
+		editSetMmfDistributionMenuItem = new javax.swing.JMenuItem();
 		editNewMmfMenuItem = new javax.swing.JMenuItem();
 		viewMenu = new javax.swing.JMenu();
 		sortMenu = new javax.swing.JMenu();
@@ -720,6 +725,7 @@ public class MainFrame extends JFrame {
 		editMenu.setText("Edit");
 		editMenu.add(editNewCategoryMenuItem);
 		editMenu.add(editNewMmfMenuItem);
+		editMenu.add(editSetMmfDistributionMenuItem);
 
 		mainMenuBar.add(editMenu);
 
@@ -786,6 +792,7 @@ public class MainFrame extends JFrame {
 	private javax.swing.JMenu editMenu;
 	private javax.swing.JMenuItem editNewCategoryMenuItem;
 	private javax.swing.JMenuItem editNewMmfMenuItem;
+	private javax.swing.JMenuItem editSetMmfDistributionMenuItem;
 	private javax.swing.JMenuItem fileExitMenuItem;
 	private javax.swing.JMenuItem fileLoadTestDataMenuItem;
 	private javax.swing.JMenuItem fileLoadProjectsRemotellyDataMenuItem;
