@@ -88,6 +88,7 @@ public class TransformJiraDialog extends JDialog {
 		middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.Y_AXIS));
 		final JButton transformButton = new JButton("Transform >>>");
 		final JButton finishButton = new JButton("Finish");
+		final JButton removeButton = new JButton("Remove <<<");
 		transformButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -118,8 +119,29 @@ public class TransformJiraDialog extends JDialog {
 				expandAllNodes(mmfsTree, 0, mmfsTree.getRowCount());
 			}
 		});
-		finishButton.addActionListener(new ActionListener() {
+		removeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				TreePath[] paths = mmfsTree.getSelectionPaths();
+				if (paths != null) {
+					for (TreePath path : paths) {
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+						DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+						if (parent != null) {
+							mmfsTreeModel.removeNodeFromParent(node);
+							if (parent.getChildCount() < 1 && !parent.isRoot()) {
+								// sin hijos
+								mmfsTreeModel.removeNodeFromParent(parent);
+							}
+						}
+					}
+					mmfsTreeModel.reload();
+					expandAllNodes(mmfsTree, 0, mmfsTree.getRowCount());
+				}
+			}
+		});
 
+		finishButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO crear proyecto y pasarlo al mainframe
@@ -149,6 +171,7 @@ public class TransformJiraDialog extends JDialog {
 		});
 
 		middlePanel.add(transformButton);
+		middlePanel.add(removeButton);
 		middlePanel.add(finishButton);
 		final JScrollPane rightScrollPane = new JScrollPane(mmfsTree);
 
