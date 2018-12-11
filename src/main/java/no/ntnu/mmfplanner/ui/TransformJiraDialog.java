@@ -19,6 +19,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import net.rcarz.jiraclient.greenhopper.Backlog;
 import no.ntnu.mmfplanner.jira.model.Board;
 import no.ntnu.mmfplanner.jira.model.Epic;
 import no.ntnu.mmfplanner.model.Mmf;
@@ -32,6 +33,7 @@ public class TransformJiraDialog extends JDialog {
 
 	private MainFrame mainFrame;
 	private Board board;
+	private Backlog backlog;
 	private String nextId;
 	private List<String> mmFsIDs;
 
@@ -44,6 +46,15 @@ public class TransformJiraDialog extends JDialog {
 		initComponents();
 	}
 
+	public TransformJiraDialog(Frame parent, boolean modal, Backlog backlog) {
+		super(parent, modal);
+		this.mainFrame = (MainFrame) parent;
+		this.backlog = backlog;
+		this.nextId = "A";
+		this.mmFsIDs = new ArrayList<String>();
+		initComponents();
+	}
+
 	private void initComponents() {
 		final DefaultMutableTreeNode rootBoard = new DefaultMutableTreeNode("Board");
 		final DefaultMutableTreeNode rootMMFs = new DefaultMutableTreeNode("MMFs");
@@ -51,22 +62,28 @@ public class TransformJiraDialog extends JDialog {
 		// TODO
 		// https://confluence.atlassian.com/jirakb/retrieve-user-stories-under-the-epic-via-rest-call-779158635.html
 
-		final CheckBoxNodeData data = new CheckBoxNodeData("Epics (" + board.getEpics().size() + ")", true);
+		final CheckBoxNodeData data = board != null ? new CheckBoxNodeData("Epics (" + board.getEpics().size() + ")",
+				true) : backlog != null ? new CheckBoxNodeData("Epics (" + backlog.getEpics().size() + ")", true)
+				: null;
+
 		final DefaultMutableTreeNode epics = new DefaultMutableTreeNode(data);
 
-		for (Epic epic : board.getEpics()) {
-			final CheckBoxNodeData epicData = new CheckBoxNodeData(epic.getName() + " (" + epic.getKey() + ")", false);
-			final DefaultMutableTreeNode epicNode = new DefaultMutableTreeNode(epicData);
-			epics.add(epicNode);
-
-			// for (Issue issue : epic.getIssues()) {
-			// final CheckBoxNodeData issueData = new CheckBoxNodeData(issue.getName() + " (" + issue.getKey()
-			// + ")"
-			// + " (" + issue.getOriginalEstimate() + ")", false);
-			// final DefaultMutableTreeNode issueNode = new DefaultMutableTreeNode(issueData);
-			// epicNode.add(issueNode);
-			// }
+		if (board != null) {
+			for (Epic epic : board.getEpics()) {
+				final CheckBoxNodeData epicData = new CheckBoxNodeData(epic.getName() + " (" + epic.getKey() + ")",
+						false);
+				final DefaultMutableTreeNode epicNode = new DefaultMutableTreeNode(epicData);
+				epics.add(epicNode);
+			}
+		} else if (backlog != null) {
+			for (net.rcarz.jiraclient.greenhopper.Epic epic : backlog.getEpics()) {
+				final CheckBoxNodeData epicData = new CheckBoxNodeData(
+						epic.getEpicLabel() + " (" + epic.getKey() + ")", false);
+				final DefaultMutableTreeNode epicNode = new DefaultMutableTreeNode(epicData);
+				epics.add(epicNode);
+			}
 		}
+
 		rootBoard.add(epics);
 
 		final DefaultTreeModel boardTreeModel = new DefaultTreeModel(rootBoard);
@@ -192,33 +209,6 @@ public class TransformJiraDialog extends JDialog {
 		getContentPane().add(splitPane1, BorderLayout.CENTER);
 
 		pack();
-	}
-
-	// backlog.getEpics();
-	// backlog.getEpics().get(0).getEpicLabel(); // Spring-Cloud-Task
-	// backlog.getEpics().get(0).getEpicStats();
-	// backlog.getEpics().get(0).getSummary(); // Update batch modules to be short lived
-	// backlog.getEpics().get(0).getTypeName(); // Epic
-	// backlog.getEpics().get(0).getPriorityName(); // Major
-	// backlog.getEpics().get(0).getStatusName(); // To Do / Done
-	// backlog.getIssues();
-	// backlog.getIssues().get(0).getAssigneeName();
-	// backlog.getIssues().get(0).getAssigneeName();
-	// backlog.getIssues().get(0).getSummary();
-	// backlog.getIssues().get(0).getTypeName();
-	// backlog.getMarkers();
-	// backlog.getProjects();
-	// backlog.getRankCustomFieldId();
-	// backlog.getSprints();
-	// backlog.getVersionsPerProject();
-	// backlog.getProjects();
-
-	private static DefaultMutableTreeNode add(final DefaultMutableTreeNode parent, final String text,
-			final boolean checked) {
-		final CheckBoxNodeData data = new CheckBoxNodeData(text, checked);
-		final DefaultMutableTreeNode node = new DefaultMutableTreeNode(data);
-		parent.add(node);
-		return node;
 	}
 
 	private CheckBoxNodeData getData(final DefaultMutableTreeNode node) {
