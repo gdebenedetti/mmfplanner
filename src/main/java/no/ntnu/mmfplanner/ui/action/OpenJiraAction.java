@@ -26,13 +26,13 @@ public class OpenJiraAction extends MainAbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String ACTION_NAME = "Import Jira Project...";
+	public static final String ACTION_NAME = "Import data from Jira Project";
 
 	public static final int ACTION_MNEMONIC = KeyEvent.VK_J;
 
-	public static final String ACTION_ACCELERATOR = "ctrl O";
+	public static final String ACTION_ACCELERATOR = "ctrl J";
 
-	public static final String ACTION_DESCRIPTION = "Import a project from Jira";
+	public static final String ACTION_DESCRIPTION = "Import data project from Jira";
 
 	public OpenJiraAction(MainFrame mainFrame) {
 		super(mainFrame, ACTION_NAME, ACTION_MNEMONIC, ACTION_ACCELERATOR, ACTION_DESCRIPTION);
@@ -51,19 +51,5 @@ public class OpenJiraAction extends MainAbstractAction {
 
 		ImportJiraDialog importJiraDialog = new ImportJiraDialog(mainFrame, true);
 		importJiraDialog.setVisible(true);
-		/*
-		 * // show a file chooser JFileChooser fc = new JFileChooser();
-		 * fc.setFileSelectionMode(JFileChooser.FILES_ONLY); fc.setDialogType(JFileChooser.OPEN_DIALOG);
-		 * fc.setMultiSelectionEnabled(false); fc.setAcceptAllFileFilterUsed(true); FileFilter filter = new
-		 * JiraFileFilter(); fc.addChoosableFileFilter(filter); if (JFileChooser.APPROVE_OPTION !=
-		 * fc.showOpenDialog(mainFrame)) { return; }
-		 * 
-		 * try { // serialize and write to file File file = fc.getSelectedFile(); InputStream is = new
-		 * BufferedInputStream(new FileInputStream(file)); // TODO Read Jira File // Project project =
-		 * XmlDeserializer.readProject(mainFrame.getTabPanePanelPlacement(), is); //
-		 * mainFrame.setModel(project); } catch (Exception e) { e.printStackTrace();
-		 * JOptionPane.showMessageDialog(mainFrame, "An error occured while opening Jira project:\n" + e,
-		 * "Error", JOptionPane.ERROR_MESSAGE); }
-		 */
 	}
 }

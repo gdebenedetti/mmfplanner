@@ -38,6 +38,7 @@ import no.ntnu.mmfplanner.ui.action.MoveTabAction;
 import no.ntnu.mmfplanner.ui.action.NewCategoryAction;
 import no.ntnu.mmfplanner.ui.action.NewMmfAction;
 import no.ntnu.mmfplanner.ui.action.NewProjectAction;
+import no.ntnu.mmfplanner.ui.action.OpenJiraAction;
 import no.ntnu.mmfplanner.ui.action.OpenProjectAction;
 import no.ntnu.mmfplanner.ui.action.OptimalSortAction;
 import no.ntnu.mmfplanner.ui.action.PrecursorSortAction;
@@ -270,7 +271,8 @@ public class MainFrame extends JFrame {
 		categoryDeleteMenuItem.setAction(new DeleteCategoryAction(this));
 		mmfDeleteMenuItem.setAction(new DeleteMmfAction(this));
 		fileNewProjectMenuItem.setAction(new NewProjectAction(this));
-		fileImportProjectMenuItem.setAction(new ImportAction(this));
+		//fileImportProjectMenuItem.setAction(new ImportAction(this));
+		fileImportProjectMenuItem.setAction(new OpenJiraAction(this));
 		fileSaveProjectMenuItem.setAction(new SaveProjectAction(this));
 		fileSaveProjectRemotelyMenuItem.setAction(new SaveProjectRemotellyAction(this));
 		fileOpenProjectMenuItem.setAction(new OpenProjectAction(this));
