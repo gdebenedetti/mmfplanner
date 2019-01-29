@@ -46,7 +46,7 @@ public class Project implements PropertyChangeListener {
 	 * Creates a new IFM Project with default values for all properties.
 	 */
 	public Project() {
-		this.name = "New MMF Project";
+		this.name = "New Project";
 		this.periods = 12;
 		this.interestRate = 0.008;
 		this.nextId = "A";
