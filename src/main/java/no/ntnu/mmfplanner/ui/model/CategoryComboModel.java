@@ -23,8 +23,8 @@ import no.ntnu.mmfplanner.model.Project;
  * ComboBoxModel for use in the category table in properties panel, as well as
  * the MMF table.
  */
-public class CategoryComboModel extends AbstractListModel implements
-        ComboBoxModel, PropertyChangeListener {
+public class CategoryComboModel extends AbstractListModel<Category> implements
+        ComboBoxModel<Category>, PropertyChangeListener {
     private static final long serialVersionUID = 1L;
 
     Project project;
@@ -43,7 +43,7 @@ public class CategoryComboModel extends AbstractListModel implements
         selected = (Category) arg0;
     }
 
-    public Object getElementAt(int position) {
+    public Category getElementAt(int position) {
         if (position == 0) {
             return null;
         } else {
