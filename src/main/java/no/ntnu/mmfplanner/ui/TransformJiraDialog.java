@@ -1,6 +1,8 @@
 package no.ntnu.mmfplanner.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -15,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -34,15 +38,13 @@ public class TransformJiraDialog extends JDialog {
 	private MainFrame mainFrame;
 	private Board board;
 	private Backlog backlog;
-	private String nextId;
-	private List<String> mmFsIDs;
+	private String nextId = "A";
+	private List<String> mmFsIDs = new ArrayList<String>();
 
 	public TransformJiraDialog(Frame parent, boolean modal, Board board) {
 		super(parent, modal);
 		this.mainFrame = (MainFrame) parent;
 		this.board = board;
-		this.nextId = "A";
-		this.mmFsIDs = new ArrayList<String>();
 		initComponents();
 	}
 
@@ -50,12 +52,12 @@ public class TransformJiraDialog extends JDialog {
 		super(parent, modal);
 		this.mainFrame = (MainFrame) parent;
 		this.backlog = backlog;
-		this.nextId = "A";
-		this.mmFsIDs = new ArrayList<String>();
 		initComponents();
 	}
 
 	private void initComponents() {
+		setTitle("Create new Project and MMFs from JIRA");
+		
 		final DefaultMutableTreeNode rootBoard = new DefaultMutableTreeNode("Board");
 		final DefaultMutableTreeNode rootMMFs = new DefaultMutableTreeNode("MMFs");
 
@@ -70,6 +72,7 @@ public class TransformJiraDialog extends JDialog {
 
 		if (board != null) {
 			for (Epic epic : board.getEpics()) {
+				//  TODO board.getName()
 				final CheckBoxNodeData epicData = new CheckBoxNodeData(epic.getName() + " (" + epic.getKey() + ")",
 						false);
 				final DefaultMutableTreeNode epicNode = new DefaultMutableTreeNode(epicData);
@@ -99,12 +102,10 @@ public class TransformJiraDialog extends JDialog {
 		epicsTree.setEditable(true);
 		epicsTree.setVisibleRowCount(rootBoard.getLeafCount());
 		epicsTree.expandPath(new TreePath(epics.getPath()));
-
 		final JScrollPane leftScrollPane = new JScrollPane(epicsTree);
-		final JPanel middlePanel = new JPanel();
-		middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.Y_AXIS));
-		final JButton transformButton = new JButton("Transform >>>");
-		final JButton finishButton = new JButton("Finish");
+		
+		final JButton transformButton = new JButton("Set as new MMF >>>", UIManager.getIcon("FileView.floppyDriveIcon"));
+		final JButton finishButton = new JButton("Finish", UIManager.getIcon("InternalFrame.maximizeIcon"));
 		final JButton removeButton = new JButton("Remove <<<");
 		transformButton.addActionListener(new ActionListener() {
 			@Override
@@ -161,8 +162,7 @@ public class TransformJiraDialog extends JDialog {
 		finishButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO crear proyecto y pasarlo al mainframe
-				Project project = new Project("JIRA_2_IFM", 6, 0.1, 1);
+				Project project = new Project();
 
 				// Creo las MMFs
 				int childCount = rootMMFs.getChildCount();
@@ -186,26 +186,39 @@ public class TransformJiraDialog extends JDialog {
 				closeButtonAction(null);
 			}
 		});
-
+		
+		transformButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		removeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		finishButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		final JPanel middlePanel = new JPanel();
+		middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.Y_AXIS));
+		middlePanel.add(Box.createRigidArea(new Dimension(100, 50)));
 		middlePanel.add(transformButton);
+		middlePanel.add(Box.createRigidArea(new Dimension(100, 50)));
 		middlePanel.add(removeButton);
+		middlePanel.add(Box.createRigidArea(new Dimension(100, 50)));
 		middlePanel.add(finishButton);
-		final JScrollPane rightScrollPane = new JScrollPane(mmfsTree);
 
-		JSplitPane splitPane1 = new JSplitPane();
-		splitPane1.setOneTouchExpandable(true);
-		splitPane1.setDividerLocation(250);
+		final JScrollPane rightScrollPane = new JScrollPane(mmfsTree);
+		rightScrollPane.setMinimumSize(new Dimension(400, 800));
+
 		JSplitPane splitPane2 = new JSplitPane();
 		splitPane2.setOneTouchExpandable(true);
-		splitPane2.setDividerLocation(150);
-
-		splitPane1.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-		splitPane1.setRightComponent(splitPane2);
-		splitPane1.setLeftComponent(leftScrollPane);
+		splitPane2.setDividerLocation(200);
 		splitPane2.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane2.setRightComponent(rightScrollPane);
 		splitPane2.setLeftComponent(middlePanel);
+		splitPane2.getRightComponent().setMinimumSize(new Dimension(400, 800));
 
+		JSplitPane splitPane1 = new JSplitPane();
+		splitPane1.setOneTouchExpandable(true);
+		splitPane1.setDividerLocation(400);
+		splitPane1.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane1.setRightComponent(splitPane2);
+		splitPane1.setLeftComponent(leftScrollPane);
+		splitPane1.getLeftComponent().setMinimumSize(new Dimension(400, 800));
+		
 		getContentPane().add(splitPane1, BorderLayout.CENTER);
 
 		pack();
