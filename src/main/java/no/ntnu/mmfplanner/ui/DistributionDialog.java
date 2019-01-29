@@ -17,51 +17,68 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.MatteBorder;
 
 import no.ntnu.mmfplanner.ui.model.RevenueTableModel;
 import no.ntnu.mmfplanner.ui.renderer.RevenueTableCellRenderer;
 
 import org.uncommons.maths.demo.DistributionPanel;
 import org.uncommons.maths.demo.GraphPanel;
+import org.uncommons.maths.demo.MultiplicationFactorPanel;
 import org.uncommons.maths.demo.ProbabilityDistribution;
-import org.uncommons.maths.demo.RNGPanel;
 import org.uncommons.swing.SwingBackgroundTask;
+import javax.swing.SwingConstants;
 
 public class DistributionDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
 	private final DistributionPanel distributionPanel = new DistributionPanel();
-	private final RNGPanel rngPanel = new RNGPanel();
+//	private final RNGPanel rngPanel = new RNGPanel();
+	private final MultiplicationFactorPanel multiplicationFactorPanel = new MultiplicationFactorPanel(); 
 	private final GraphPanel graphPanel = new GraphPanel();
-	private final JTable revenueTable = new javax.swing.JTable();
+	private final JTable revenueTable;
 	private ProbabilityDistribution distribution;
 
 	public DistributionDialog(MainFrame parent, boolean modal) {
 		super(parent, modal);
-		setTitle("Chose distribution");
+		setTitle("Select probability distribution for MMFs");
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		setLayout(new BorderLayout());
-		add(initComponents(), BorderLayout.WEST);
-		add(graphPanel, BorderLayout.CENTER);
+		getContentPane().setLayout(new BorderLayout());
+		getContentPane().add(initComponents(), BorderLayout.LINE_START);
+		getContentPane().add(graphPanel, BorderLayout.CENTER);
 
+		revenueTable = new JTable() {
+		    @Override
+		    public Dimension getPreferredScrollableViewportSize() {
+		        Dimension dim = super.getPreferredScrollableViewportSize();
+		        // here we return the pref height
+		        dim.height = getPreferredSize().height;
+		        return dim;
+		    }
+
+		};
+		
 		revenueTable.setBackground(Color.WHITE);
 		revenueTable.setModel(new RevenueTableModel(parent.getProject()));
 		revenueTable.setDefaultRenderer(Object.class, new RevenueTableCellRenderer());
+		revenueTable.setBorder(new MatteBorder(1, 0, 1, 0, Color.BLACK) );
+		revenueTable.getColumnModel().getColumn(0).setMinWidth(100);
+		getContentPane().add(new JScrollPane(revenueTable), BorderLayout.PAGE_END);
 
-		add(revenueTable, BorderLayout.SOUTH);
-		setSize(700, 500);
-		setMinimumSize(new Dimension(500, 250));
+		setSize(750, 700);
+		setMinimumSize(new Dimension(650, 500));
 		validate();
 	}
 
 	private JComponent initComponents() {
 		Box controls = new Box(BoxLayout.Y_AXIS);
 		controls.add(distributionPanel);
-		controls.add(rngPanel);
-
-		JButton executeButton = new JButton("Go");
+//		controls.add(rngPanel);
+		
+		JButton executeButton = new JButton("Go >>");
 		executeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
 				DistributionDialog.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -70,10 +87,8 @@ public class DistributionDialog extends JDialog {
 					protected GraphData performTask() {
 						distribution = distributionPanel.createProbabilityDistribution();
 
-						Map<Double, Double> observedValues = distribution.generateValues(rngPanel.getIterations(),
-								rngPanel.getRNG());
 						Map<Double, Double> expectedValues = distribution.getExpectedValues();
-						return new GraphData(observedValues, expectedValues, distribution.getExpectedMean(),
+						return new GraphData(null, expectedValues, distribution.getExpectedMean(),
 								distribution.getExpectedStandardDeviation());
 					}
 
@@ -86,9 +101,9 @@ public class DistributionDialog extends JDialog {
 				}.execute();
 			}
 		});
-		controls.add(executeButton);
 
-		JButton setDistributionButton = new JButton("Set Distribution");
+		JButton setDistributionButton = new JButton("Set Distribution   vv");
+		setDistributionButton.setHorizontalAlignment(SwingConstants.LEFT);
 		setDistributionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -96,40 +111,43 @@ public class DistributionDialog extends JDialog {
 					RevenueTableModel model = (RevenueTableModel) revenueTable.getModel();
 					int filaMMF = revenueTable.getSelectedRow();
 					if (filaMMF != -1) {
-
+						
 						// comparo cantidad de períodos con la cantidad de valores generados por la
 						// distribución
-						Map<Double, Double> expectedValues = distribution.getExpectedValues();
-						int expectedValuesCount = expectedValues.size();
+						int expectedValuesCount = distribution.getExpectedValues().size();
 						if (model.getColumnCount() <= expectedValuesCount) {
 							// si hay menos o igual cantidad de periodos que de valores generados
 
 							double step = (double) expectedValuesCount / model.getColumnCount();
 							double valueAt = 0.0;
 
-							// itero los valores del keyset que por ser LinkedHashMap vienen ordenados
-							final Set<Map.Entry<Double, Double>> entries = expectedValues.entrySet();
-							List<Double> values = new ArrayList<>();
+							// itero los valores del keyset que por ser LinkedHashMap/TreeMap vienen ordenados
+							final Set<Map.Entry<Double, Double>> entries = distribution.getExpectedValues().entrySet();
+							List<Double> arrayvalues = new ArrayList<>();
 							for (Map.Entry<Double, Double> entry : entries) {
 								Double value = entry.getValue();
-								values.add(value);
+								arrayvalues.add(value);
 							}
 
 							for (int i = 0; i < model.getColumnCount(); i++) {
-								Double value = values.get((int) valueAt);
-								value = value * 100; // TODO factor de multiplicacion
+								Double value = arrayvalues.get((int) valueAt);
+								value = value * multiplicationFactorPanel.getMultiplicationFactor();
 								model.setValueAt(value.intValue(), filaMMF, i);
 								valueAt = valueAt + step;
 							}
 
 						} else {
 							// si hay más períodos que valores generados
-							JOptionPane.showMessageDialog(null, "generar rango de valores más amplio");
+							JOptionPane.showMessageDialog(null, "Wide range of values needed");
 						}
 					}
 				}
 			}
 		});
+		
+		controls.add(executeButton);
+		
+		controls.add(multiplicationFactorPanel);
 		controls.add(setDistributionButton);
 
 		return controls;
