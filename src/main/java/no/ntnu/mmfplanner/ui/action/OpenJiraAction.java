@@ -26,7 +26,7 @@ public class OpenJiraAction extends MainAbstractAction {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String ACTION_NAME = "Import data from Jira Project";
+	public static final String ACTION_NAME = "Create New Project from JIRA";
 
 	public static final int ACTION_MNEMONIC = KeyEvent.VK_J;
 
