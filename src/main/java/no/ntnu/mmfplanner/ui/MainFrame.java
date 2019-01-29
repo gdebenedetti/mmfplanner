@@ -31,7 +31,6 @@ import no.ntnu.mmfplanner.ui.action.DeleteCategoryAction;
 import no.ntnu.mmfplanner.ui.action.DeleteMmfAction;
 import no.ntnu.mmfplanner.ui.action.HeuristicSortAction;
 import no.ntnu.mmfplanner.ui.action.HideTabAction;
-import no.ntnu.mmfplanner.ui.action.ImportAction;
 import no.ntnu.mmfplanner.ui.action.LoadProjectsRemotelyAction;
 import no.ntnu.mmfplanner.ui.action.LoadTestProjectAction;
 import no.ntnu.mmfplanner.ui.action.MoveTabAction;
@@ -143,25 +142,29 @@ public class MainFrame extends JFrame {
 			return false;
 		}
 
-		// / TODO add save remotelly option
-		int answer = JOptionPane.showConfirmDialog(this, "Do you want to save this project before you close it?",
-				"Save?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (answer == JOptionPane.YES_OPTION) {
+		String[] options = new String[] {"To local file", "Remote", "No"};
+	    int response = JOptionPane.showOptionDialog(this, "Do you want to save this project before you close it?", "Save?",
+	        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		
+		if(response == 0) {
 			SaveProjectAction save = new SaveProjectAction(this);
 			return !save.save();
-		} else if (answer == JOptionPane.CANCEL_OPTION) {
-			return true;
-		} else {
+		} else if(response == 1) {
+			SaveProjectRemotellyAction save = new SaveProjectRemotellyAction(this);
+			return !save.save();
+		} else if(response == 2) {
 			return false;
+		} else {
+			return true;
 		}
-
+	    
 	}
 
 	public void updateTitle() {
 		if ((project != null) && (project.getName() != null) && !"".equals(project.getName())) {
-			setTitle(project.getName() + " - MMF Planner");
+			setTitle(project.getName() + " / ReRo - Release early, Release often");
 		} else {
-			setTitle("MMF Planner");
+			setTitle("ReRo - Release early, Release often");
 		}
 	}
 
@@ -177,6 +180,16 @@ public class MainFrame extends JFrame {
 			}
 		});
 		updateTitle();
+
+		project.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals(Mmf.EVENT_REVENUES) || evt.getPropertyName().equals(Project.EVENT_MMFS)) {
+					editSetMmfDistributionMenuItem.setVisible(true);
+				}
+			}
+		});
+		editSetMmfDistributionMenuItem.setVisible(true);
 
 		// Project properties
 		projectPropertiesAdapter.setModel(project);
@@ -244,8 +257,8 @@ public class MainFrame extends JFrame {
 		mmfTable.setDefaultEditor(Category.class, new DefaultCellEditor(categoryComboBox));
 		mmfTable.setDefaultRenderer(Category.class, new CategoryComboCellRenderer());
 		mmfTable.addMouseListener(new PopupListener(mmfTablePopupMenu));
-		mmfTable.setColumnModel(new RelativeTableColumnModel(new int[] { 0, 1, 2, 3, 4 }, new int[] { 20, 200, 50, 8,
-				50 }));
+		mmfTable.setColumnModel(new RelativeTableColumnModel(new int[] { 0, 1, 2, 3, 4 }, new int[] { 10, 400, 10, 10,
+				10 }));
 		revenueTable.setColumnModel(new RelativeTableColumnModel(new int[] { 0 }, new int[] { 400 }));
 
 		roiTable.setDefaultRenderer(Object.class, new RoiTableCellRenderer());
@@ -271,7 +284,7 @@ public class MainFrame extends JFrame {
 		categoryDeleteMenuItem.setAction(new DeleteCategoryAction(this));
 		mmfDeleteMenuItem.setAction(new DeleteMmfAction(this));
 		fileNewProjectMenuItem.setAction(new NewProjectAction(this));
-		//fileImportProjectMenuItem.setAction(new ImportAction(this));
+		// fileImportProjectMenuItem.setAction(new ImportAction(this));
 		fileImportProjectMenuItem.setAction(new OpenJiraAction(this));
 		fileSaveProjectMenuItem.setAction(new SaveProjectAction(this));
 		fileSaveProjectRemotelyMenuItem.setAction(new SaveProjectRemotellyAction(this));
@@ -689,7 +702,7 @@ public class MainFrame extends JFrame {
 		lowerPanePopupMenu.add(lowerPaneHideMenuItem);
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-		setTitle("MMF Planner");
+		setTitle("ReRo - Release early, Release often");
 
 		mainSplitPane.setDividerLocation(350);
 		mainSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -727,6 +740,8 @@ public class MainFrame extends JFrame {
 		editMenu.setText("Edit");
 		editMenu.add(editNewCategoryMenuItem);
 		editMenu.add(editNewMmfMenuItem);
+		editSetMmfDistributionMenuItem.setVisible(false);
+
 		editMenu.add(editSetMmfDistributionMenuItem);
 
 		mainMenuBar.add(editMenu);
@@ -756,9 +771,9 @@ public class MainFrame extends JFrame {
 			}
 		});
 		helpMenu.add(helpAboutMenuItem);
-		helpAboutMenuItem.getAccessibleContext().setAccessibleName("About MMF Planner...");
+		helpAboutMenuItem.getAccessibleContext().setAccessibleName("About ReRo...");
 
-		mainMenuBar.add(helpMenu);
+		// mainMenuBar.add(helpMenu);
 		helpMenu.getAccessibleContext().setAccessibleName("");
 
 		setJMenuBar(mainMenuBar);
