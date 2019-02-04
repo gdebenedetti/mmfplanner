@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingWorker;
@@ -28,7 +27,6 @@ import net.rcarz.jiraclient.JiraException;
 import net.rcarz.jiraclient.TokenCredentials;
 import net.rcarz.jiraclient.agile.AgileClient;
 import net.rcarz.jiraclient.agile.Epic;
-import net.rcarz.jiraclient.agile.Issue;
 import net.rcarz.jiraclient.greenhopper.Backlog;
 import net.rcarz.jiraclient.greenhopper.GreenHopperClient;
 import net.rcarz.jiraclient.greenhopper.RapidView;
@@ -47,7 +45,6 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 	private MainFrame mainFrame;
 	private Board board;
 	private Backlog backlog;
-	private JTextField textField;
 
 	public ImportJiraDialog(java.awt.Frame parent, boolean modal) {
 		super(parent, modal);
@@ -57,13 +54,13 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 	}
 
 	private void initComponents() {
-		setTitle("Jira Credentials");
+		setTitle("New project from JIRA");
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		setLocationByPlatform(true);
 		setName("importJiraDialog"); // NOI18N
 		setResizable(false);
 
-		JLabel lblCredentials = new JLabel("Credentials");
+		JLabel lblCredentials = new JLabel("JIRA Credentials");
 		lblCredentials.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		JLabel lblUser = new JLabel("User*");
 		JLabel lblPassword = new JLabel("Password*");
@@ -72,14 +69,24 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 
 		txtUser = new JTextField();
 		txtUser.setText("gdebenedetti");
+		//txtUser.setText("agustin.dib@joinmosaic.com");
 		txtUser.setColumns(10);
 
 		txtPassword = new JPasswordField();
 		txtPassword.setText("Master44!!");
+		//txtPassword.setText("ApDpXlMosAI@2018");
 		txtPassword.setColumns(10);
 
 		textURL = new JTextField();
-		textURL.setText("https://jira.spring.io");
+		textURL.setText("http://jirahn.tigo.com.hn");
+		// https://joinmosaic.atlassian.net
+		// https://jira.spring.io
+		// https://issues.apache.org/jira/
+		// https://tracker.fdvs.com.ar
+		// http://jira.atlassian.com
+		// RapidStart.jspa
+		// http://jirahn.tigo.com.hn
+		// https://jira.bikalabs.com
 		textURL.setColumns(10);
 
 		JLabel lblHttpsjiraspringio = new JLabel("https://jira.spring.io");
@@ -93,7 +100,8 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 		formatter.setAllowsInvalid(false);
 
 		txtProjectid = new JFormattedTextField(formatter);
-		txtProjectid.setValue(43);
+		// txtProjectid.setValue(43);
+		txtProjectid.setValue(87);
 		txtProjectid.setColumns(10);
 
 		JButton btnConnect = new JButton("Connect");
@@ -134,124 +142,134 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 			}
 		});
 
-		JButton btnClose = new JButton("Close");
-		btnClose.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				closeButtonAction(evt);
-			}
-		});
-
-		JSeparator separator = new JSeparator();
-
-		JLabel lblTransformationOptions = new JLabel("Transformation options");
-
-		JLabel lblStoryPointsAverage = new JLabel("Story points average");
-
-		textField = new JTextField();
-		textField.setColumns(10);
-
 		// Group the radio buttons.
 		ButtonGroup group = new ButtonGroup();
 		rdbtnAgileClient = new JRadioButton("Agile Client");
+		rdbtnAgileClient.setSelected(true);
 		rdbtnGreehopperClient = new JRadioButton("Greehopper Client");
 		group.add(rdbtnAgileClient);
 		group.add(rdbtnGreehopperClient);
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(87)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(separator, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
-							.addContainerGap())
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(lblStoryPointsAverage)
-							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addGroup(groupLayout.createSequentialGroup()
-									.addGap(231)
-									.addComponent(btnClose, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btnConnect, GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE))
-								.addGroup(groupLayout.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-							.addContainerGap())
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-									.addComponent(lblCredentials, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(lblPassword, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(lblUser, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE))
-								.addComponent(lblUrl)
-								.addComponent(lblProjectId))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-								.addGroup(groupLayout.createSequentialGroup()
-									.addComponent(txtProjectid, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addContainerGap(398, Short.MAX_VALUE))
-								.addGroup(groupLayout.createSequentialGroup()
-									.addComponent(textURL, GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(lblHttpsjiraspringio)
-									.addGap(50))
-								.addGroup(groupLayout.createSequentialGroup()
-									.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-										.addComponent(txtUser, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addComponent(txtPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-									.addContainerGap(398, Short.MAX_VALUE))))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(lblTransformationOptions)
-							.addContainerGap(481, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-							.addComponent(rdbtnAgileClient)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(rdbtnGreehopperClient)
-							.addContainerGap())))
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(lblCredentials, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblUser)
-								.addComponent(txtUser, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblPassword)
-								.addComponent(txtPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblUrl)
-								.addComponent(textURL, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblHttpsjiraspringio))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblProjectId)
-								.addComponent(txtProjectid, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(separator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblTransformationOptions))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(198)
-							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(rdbtnAgileClient)
-								.addComponent(rdbtnGreehopperClient))))
-					.addGap(15)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-							.addComponent(btnConnect)
-							.addComponent(btnClose))
-						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-							.addComponent(lblStoryPointsAverage)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
-		);
+		groupLayout
+				.setHorizontalGroup(groupLayout
+						.createParallelGroup(Alignment.LEADING)
+						.addGroup(
+								groupLayout
+										.createSequentialGroup()
+										.addContainerGap()
+										.addComponent(lblCredentials, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addGap(565))
+						.addGroup(
+								groupLayout
+										.createSequentialGroup()
+										.addContainerGap()
+										.addGroup(
+												groupLayout
+														.createParallelGroup(Alignment.TRAILING, false)
+														.addComponent(lblPassword, Alignment.LEADING,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+																Short.MAX_VALUE)
+														.addComponent(lblUser, Alignment.LEADING,
+																GroupLayout.PREFERRED_SIZE, 104,
+																GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addGroup(
+												groupLayout
+														.createParallelGroup(Alignment.LEADING)
+														.addComponent(txtUser, GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+														.addComponent(txtPassword, GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+										.addContainerGap(475, Short.MAX_VALUE))
+						.addGroup(
+								Alignment.TRAILING,
+								groupLayout
+										.createSequentialGroup()
+										.addContainerGap()
+										.addGroup(
+												groupLayout
+														.createParallelGroup(Alignment.TRAILING)
+														.addGroup(
+																Alignment.LEADING,
+																groupLayout
+																		.createSequentialGroup()
+																		.addComponent(rdbtnAgileClient)
+																		.addPreferredGap(ComponentPlacement.UNRELATED)
+																		.addComponent(rdbtnGreehopperClient)
+																		.addPreferredGap(ComponentPlacement.RELATED,
+																				348, GroupLayout.PREFERRED_SIZE))
+														.addGroup(
+																Alignment.LEADING,
+																groupLayout
+																		.createSequentialGroup()
+																		.addGroup(
+																				groupLayout
+																						.createParallelGroup(
+																								Alignment.LEADING)
+																						.addComponent(lblUrl)
+																						.addComponent(lblProjectId))
+																		.addGap(60)
+																		.addGroup(
+																				groupLayout
+																						.createParallelGroup(
+																								Alignment.LEADING)
+																						.addGroup(
+																								groupLayout
+																										.createSequentialGroup()
+																										.addComponent(
+																												textURL,
+																												GroupLayout.DEFAULT_SIZE,
+																												333,
+																												Short.MAX_VALUE)
+																										.addPreferredGap(
+																												ComponentPlacement.RELATED)
+																										.addComponent(
+																												lblHttpsjiraspringio))
+																						.addComponent(
+																								txtProjectid,
+																								GroupLayout.PREFERRED_SIZE,
+																								GroupLayout.DEFAULT_SIZE,
+																								GroupLayout.PREFERRED_SIZE)))
+														.addComponent(btnConnect, GroupLayout.PREFERRED_SIZE, 184,
+																GroupLayout.PREFERRED_SIZE)).addGap(127)));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(
+				groupLayout
+						.createSequentialGroup()
+						.addComponent(lblCredentials, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addGroup(
+								groupLayout
+										.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblUser)
+										.addComponent(txtUser, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE))
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addGroup(
+								groupLayout
+										.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblPassword)
+										.addComponent(txtPassword, GroupLayout.PREFERRED_SIZE,
+												GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(11)
+						.addGroup(
+								groupLayout
+										.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblUrl)
+										.addComponent(textURL, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE).addComponent(lblHttpsjiraspringio))
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addGroup(
+								groupLayout
+										.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblProjectId)
+										.addComponent(txtProjectid, GroupLayout.PREFERRED_SIZE,
+												GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(18)
+						.addGroup(
+								groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(rdbtnAgileClient)
+										.addComponent(rdbtnGreehopperClient)).addGap(18).addComponent(btnConnect)
+						.addGap(35)));
 		getContentPane().setLayout(groupLayout);
 
 		pack();
@@ -278,11 +296,12 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 		SwingWorker<?, ?> workerAgile = new SwingWorker<Board, Void>() {
 			protected Board doInBackground() throws InterruptedException, JiraException {
 
-				// BasicCredentials creds = new BasicCredentials(txtUser.getText(), String.valueOf(txtPassword
-				// .getPassword()));
-				TokenCredentials tokenCredentials = new TokenCredentials(txtUser.getText(), String.valueOf(txtPassword
+//				 BasicCredentials credentials = new BasicCredentials(txtUser.getText(),
+//				 String.valueOf(txtPassword
+//				 .getPassword()));
+				TokenCredentials credentials = new TokenCredentials(txtUser.getText(), String.valueOf(txtPassword
 						.getPassword()));
-				JiraClient jira = new JiraClient(textURL.getText(), tokenCredentials);
+				JiraClient jira = new JiraClient(textURL.getText(), credentials);
 
 				AgileClient ac = new AgileClient(jira);
 
@@ -300,12 +319,13 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 					no.ntnu.mmfplanner.jira.model.Epic e = new no.ntnu.mmfplanner.jira.model.Epic(epic.getId(),
 							epic.getName(), epic.getKey(), epic.getSummary(), epic.isDone());
 
-					List<Issue> issues = epic.getIssues();
-					for (Issue issue : issues) {
-						no.ntnu.mmfplanner.jira.model.Issue i = new no.ntnu.mmfplanner.jira.model.Issue(issue.getId(),
-								issue.getName(), issue.getKey(), issue.getTimeTracking().getOriginalEstimate(), e);
-						e.getIssues().add(i);
-					}
+					// TODO check if user has permision to view epic's issues
+//					List<Issue> issues = epic.getIssues();
+//					for (Issue issue : issues) {
+//						no.ntnu.mmfplanner.jira.model.Issue i = new no.ntnu.mmfplanner.jira.model.Issue(issue.getId(),
+//								issue.getName(), issue.getKey(), issue.getTimeTracking().getOriginalEstimate(), e);
+//						e.getIssues().add(i);
+//					}
 
 					board.getEpics().add(e);
 				}
@@ -327,7 +347,7 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 						why = e.getMessage();
 					}
 					System.err.println("Error retrieving file: " + why);
-					JOptionPane.showMessageDialog(mainFrame, "Failed to load Jira projects.", "Fail!",
+					JOptionPane.showMessageDialog(mainFrame, "Failed to load JIRA data.", "Fail!",
 							JOptionPane.WARNING_MESSAGE);
 				}
 			}
@@ -336,11 +356,11 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 		SwingWorker<?, ?> workerGreehopper = new SwingWorker<Backlog, Void>() {
 			protected Backlog doInBackground() throws InterruptedException, JiraException {
 
-				// BasicCredentials creds = new BasicCredentials(txtUser.getText(), String.valueOf(txtPassword
-				// .getPassword()));
-				TokenCredentials tokenCredentials = new TokenCredentials(txtUser.getText(), String.valueOf(txtPassword
+//				BasicCredentials credentials = new BasicCredentials(txtUser.getText(), String.valueOf(txtPassword
+//						.getPassword()));
+				TokenCredentials credentials = new TokenCredentials(txtUser.getText(), String.valueOf(txtPassword
 						.getPassword()));
-				JiraClient jira = new JiraClient(textURL.getText(), tokenCredentials);
+				JiraClient jira = new JiraClient(textURL.getText(), credentials);
 
 				GreenHopperClient gh = new GreenHopperClient(jira);
 				// ID del proyecto Spring XD
@@ -366,7 +386,7 @@ public class ImportJiraDialog extends javax.swing.JDialog {
 						why = e.getMessage();
 					}
 					System.err.println("Error retrieving file: " + why);
-					JOptionPane.showMessageDialog(mainFrame, "Failed to load Jira projects.", "Fail!",
+					JOptionPane.showMessageDialog(mainFrame, "Failed to load JIRA data.", "Fail!",
 							JOptionPane.WARNING_MESSAGE);
 				}
 			}
