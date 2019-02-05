@@ -57,7 +57,7 @@ public class TransformJiraDialog extends JDialog {
 
 	private void initComponents() {
 		setTitle("Create new Project and MMFs from JIRA");
-		
+
 		final DefaultMutableTreeNode rootBoard = new DefaultMutableTreeNode("Board");
 		final DefaultMutableTreeNode rootMMFs = new DefaultMutableTreeNode("MMFs");
 
@@ -72,7 +72,7 @@ public class TransformJiraDialog extends JDialog {
 
 		if (board != null) {
 			for (Epic epic : board.getEpics()) {
-				//  TODO board.getName()
+				// TODO board.getName()
 				final CheckBoxNodeData epicData = new CheckBoxNodeData(epic.getName() + " (" + epic.getKey() + ")",
 						false);
 				final DefaultMutableTreeNode epicNode = new DefaultMutableTreeNode(epicData);
@@ -103,10 +103,23 @@ public class TransformJiraDialog extends JDialog {
 		epicsTree.setVisibleRowCount(rootBoard.getLeafCount());
 		epicsTree.expandPath(new TreePath(epics.getPath()));
 		final JScrollPane leftScrollPane = new JScrollPane(epicsTree);
-		
-		final JButton transformButton = new JButton("Set as new MMF >>>", UIManager.getIcon("FileView.floppyDriveIcon"));
-		final JButton finishButton = new JButton("Finish", UIManager.getIcon("InternalFrame.maximizeIcon"));
-		final JButton removeButton = new JButton("Remove <<<");
+		final JScrollPane rightScrollPane = new JScrollPane() {
+			@Override
+			public Dimension getMinimumSize() {
+				return leftScrollPane.getPreferredSize();
+			}
+		};
+		rightScrollPane.setViewportView(mmfsTree);
+		rightScrollPane.setPreferredSize(leftScrollPane.getPreferredSize());
+
+		final JButton transformButton = new JButton("Set as new MMF >>>",
+				UIManager.getIcon("FileChooser.detailsViewIcon"));
+		final JButton finishButton = new JButton("Finish", UIManager.getIcon("FileView.floppyDriveIcon"));
+		final JButton removeButton = new JButton("Remove <<<", UIManager.getIcon("Tree.collapsedIcon"));
+		final JButton transformAllToOneButton = new JButton("Set ALL as new MMF >>>",
+				UIManager.getIcon("FileChooser.listViewIcon"));
+		final JButton transformAllToAllButton = new JButton("Set ALL as each new MMF >>>",
+				UIManager.getIcon("FileChooser.listViewIcon"));
 		transformButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -186,39 +199,91 @@ public class TransformJiraDialog extends JDialog {
 				closeButtonAction(null);
 			}
 		});
-		
+
+		transformAllToOneButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DefaultMutableTreeNode mmfNode = null;
+				boolean newMMF = true;
+				int childCount = epics.getChildCount();
+				for (int i = 0; i < childCount; i++) {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) epics.getChildAt(i);
+					if (newMMF) {
+						// nuevo MMF? Si: creo MMF padre
+						String mmfID = getNextId();
+						mmFsIDs.add(mmfID);
+						mmfNode = new DefaultMutableTreeNode("MMF " + mmfID);
+						mmfNode.add(new DefaultMutableTreeNode(((CheckBoxNodeData) getData(node)).getText()));
+						rootMMFs.add(mmfNode);
+						newMMF = false;
+					} else {
+						// sino agrego al MMF ya creado
+						mmfNode.add(new DefaultMutableTreeNode(((CheckBoxNodeData) getData(node)).getText()));
+					}
+				}
+				mmfsTreeModel.reload();
+				uncheckAllNodes(rootBoard);
+				boardTreeModel.reload();
+				expandAllNodes(epicsTree, 0, epicsTree.getRowCount());
+				expandAllNodes(mmfsTree, 0, mmfsTree.getRowCount());
+			}
+		});
+
+		transformAllToAllButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DefaultMutableTreeNode mmfNode = null;
+				int childCount = epics.getChildCount();
+				for (int i = 0; i < childCount; i++) {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) epics.getChildAt(i);
+					// nuevo MMF? Si: creo MMF padre
+					String mmfID = getNextId();
+					mmFsIDs.add(mmfID);
+					mmfNode = new DefaultMutableTreeNode("MMF " + mmfID);
+					mmfNode.add(new DefaultMutableTreeNode(((CheckBoxNodeData) getData(node)).getText()));
+					rootMMFs.add(mmfNode);
+				}
+				mmfsTreeModel.reload();
+				uncheckAllNodes(rootBoard);
+				boardTreeModel.reload();
+				expandAllNodes(epicsTree, 0, epicsTree.getRowCount());
+				expandAllNodes(mmfsTree, 0, mmfsTree.getRowCount());
+			}
+		});
+
 		transformButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		removeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		finishButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
+		transformAllToOneButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		transformAllToAllButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
 		final JPanel middlePanel = new JPanel();
 		middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.Y_AXIS));
 		middlePanel.add(Box.createRigidArea(new Dimension(100, 50)));
 		middlePanel.add(transformButton);
 		middlePanel.add(Box.createRigidArea(new Dimension(100, 50)));
+		middlePanel.add(transformAllToOneButton);
+		middlePanel.add(Box.createRigidArea(new Dimension(100, 50)));
+		middlePanel.add(transformAllToAllButton);
+		middlePanel.add(Box.createRigidArea(new Dimension(100, 50)));
 		middlePanel.add(removeButton);
 		middlePanel.add(Box.createRigidArea(new Dimension(100, 50)));
 		middlePanel.add(finishButton);
 
-		final JScrollPane rightScrollPane = new JScrollPane(mmfsTree);
-		rightScrollPane.setMinimumSize(new Dimension(400, 800));
-
 		JSplitPane splitPane2 = new JSplitPane();
-		splitPane2.setOneTouchExpandable(true);
-		splitPane2.setDividerLocation(200);
+		// splitPane2.setDividerLocation(200);
 		splitPane2.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane2.setRightComponent(rightScrollPane);
 		splitPane2.setLeftComponent(middlePanel);
-		splitPane2.getRightComponent().setMinimumSize(new Dimension(400, 800));
+		// splitPane2.getRightComponent().setMinimumSize(new Dimension(400, 0));
 
 		JSplitPane splitPane1 = new JSplitPane();
-		splitPane1.setOneTouchExpandable(true);
-		splitPane1.setDividerLocation(400);
+		// splitPane1.setDividerLocation(400);
 		splitPane1.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane1.setRightComponent(splitPane2);
 		splitPane1.setLeftComponent(leftScrollPane);
-		splitPane1.getLeftComponent().setMinimumSize(new Dimension(400, 800));
-		
+		// splitPane1.getLeftComponent().setMinimumSize(new Dimension(400, 0));
+
 		getContentPane().add(splitPane1, BorderLayout.CENTER);
 
 		pack();
