@@ -19,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.border.MatteBorder;
 
 import no.ntnu.mmfplanner.ui.model.RevenueTableModel;
@@ -29,15 +30,14 @@ import org.uncommons.maths.demo.GraphPanel;
 import org.uncommons.maths.demo.MultiplicationFactorPanel;
 import org.uncommons.maths.demo.ProbabilityDistribution;
 import org.uncommons.swing.SwingBackgroundTask;
-import javax.swing.SwingConstants;
 
 public class DistributionDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
 	private final DistributionPanel distributionPanel = new DistributionPanel();
-//	private final RNGPanel rngPanel = new RNGPanel();
-	private final MultiplicationFactorPanel multiplicationFactorPanel = new MultiplicationFactorPanel(); 
+	// private final RNGPanel rngPanel = new RNGPanel();
+	private final MultiplicationFactorPanel multiplicationFactorPanel = new MultiplicationFactorPanel();
 	private final GraphPanel graphPanel = new GraphPanel();
 	private final JTable revenueTable;
 	private ProbabilityDistribution distribution;
@@ -51,22 +51,25 @@ public class DistributionDialog extends JDialog {
 		getContentPane().add(graphPanel, BorderLayout.CENTER);
 
 		revenueTable = new JTable() {
-		    @Override
-		    public Dimension getPreferredScrollableViewportSize() {
-		        Dimension dim = super.getPreferredScrollableViewportSize();
-		        // here we return the pref height
-		        dim.height = getPreferredSize().height;
-		        return dim;
-		    }
+			@Override
+			public Dimension getPreferredScrollableViewportSize() {
+				Dimension dim = super.getPreferredScrollableViewportSize();
+				// here we return the pref height
+				dim.height = getPreferredSize().height;
+				return dim;
+			}
 
 		};
-		
+
 		revenueTable.setBackground(Color.WHITE);
 		revenueTable.setModel(new RevenueTableModel(parent.getProject()));
 		revenueTable.setDefaultRenderer(Object.class, new RevenueTableCellRenderer());
-		revenueTable.setBorder(new MatteBorder(1, 0, 1, 0, Color.BLACK) );
+		revenueTable.setBorder(new MatteBorder(1, 0, 1, 0, Color.BLACK));
 		revenueTable.getColumnModel().getColumn(0).setMinWidth(100);
-		getContentPane().add(new JScrollPane(revenueTable), BorderLayout.PAGE_END);
+		final JScrollPane jsrevenue = new JScrollPane(revenueTable);
+		jsrevenue.setPreferredSize(new Dimension(revenueTable.getPreferredSize().width,
+				revenueTable.getRowHeight() * 10));
+		getContentPane().add(jsrevenue, BorderLayout.PAGE_END);
 
 		setSize(750, 700);
 		setMinimumSize(new Dimension(650, 500));
@@ -76,8 +79,8 @@ public class DistributionDialog extends JDialog {
 	private JComponent initComponents() {
 		Box controls = new Box(BoxLayout.Y_AXIS);
 		controls.add(distributionPanel);
-//		controls.add(rngPanel);
-		
+		// controls.add(rngPanel);
+
 		JButton executeButton = new JButton("Go >>");
 		executeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
@@ -88,8 +91,8 @@ public class DistributionDialog extends JDialog {
 						distribution = distributionPanel.createProbabilityDistribution();
 
 						Map<Double, Double> expectedValues = distribution.getExpectedValues();
-						return new GraphData(null, expectedValues, distribution.getExpectedMean(),
-								distribution.getExpectedStandardDeviation());
+						return new GraphData(null, expectedValues, distribution.getExpectedMean(), distribution
+								.getExpectedStandardDeviation());
 					}
 
 					protected void postProcessing(GraphData data) {
@@ -111,7 +114,7 @@ public class DistributionDialog extends JDialog {
 					RevenueTableModel model = (RevenueTableModel) revenueTable.getModel();
 					int filaMMF = revenueTable.getSelectedRow();
 					if (filaMMF != -1) {
-						
+
 						// comparo cantidad de períodos con la cantidad de valores generados por la
 						// distribución
 						int expectedValuesCount = distribution.getExpectedValues().size();
@@ -144,9 +147,9 @@ public class DistributionDialog extends JDialog {
 				}
 			}
 		});
-		
+
 		controls.add(executeButton);
-		
+
 		controls.add(multiplicationFactorPanel);
 		controls.add(setDistributionButton);
 
