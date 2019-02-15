@@ -38,9 +38,9 @@ public class HeuristicSortAction extends MainAbstractAction {
      * Start the IFM Heuristic sorter
      */
     public void actionPerformed(ActionEvent e) {
-        ProjectSorter optimalSorter = new HeuristicProjectSorter(mainFrame.getProject());
-        SortDialog sortDialog = new SortDialog(mainFrame, enabled, optimalSorter);
-        optimalSorter.start(true);
+    	HeuristicProjectSorter heuristicSorter = new HeuristicProjectSorter(mainFrame.getProject());
+        SortDialog sortDialog = new SortDialog(mainFrame, enabled, heuristicSorter);
+        heuristicSorter.start(true);
         sortDialog.setVisible(true);
     }
 
