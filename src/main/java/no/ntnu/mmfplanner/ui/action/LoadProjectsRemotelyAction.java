@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -70,7 +69,7 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 			JOptionPane.showMessageDialog(mainFrame, "Failed to load projects remotely.", "Fail!",
 					JOptionPane.WARNING_MESSAGE);
 		} else {
-			loadProjectsLocaly();
+			selectProject();
 		}
 	}
 
@@ -81,13 +80,13 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 		JPanel p1 = new JPanel(new GridBagLayout());
 		p1.add(new JLabel("Please Wait..."), new GridBagConstraints());
 		d.getContentPane().add(p1);
-		d.setSize(100, 100);
+		d.setSize(200, 200);
 		d.setLocationRelativeTo(mainFrame);
 		d.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		d.setModal(true);
 
-		SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
-			protected Void doInBackground() throws InterruptedException {
+		SwingWorker<?, ?> worker = new SwingWorker<Boolean, Void>() {
+			protected Boolean doInBackground() throws InterruptedException {
 
 				ClientResource clientJSON = new ClientResource(
 						"https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsJSON");
@@ -103,19 +102,17 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 				try {
 					clientJSON.get().write(stringWriter);
 				} catch (ResourceException | IOException e) {
-					// TODO
+					e.printStackTrace();
+					return Boolean.FALSE;
 				}
 
 				if (!clientJSON.getStatus().isSuccess()) {
-					// TODO
+					return Boolean.FALSE;
 				}
 
 				projects = stringWriter.toString();
 
-				return null;
-			}
-
-			protected void process(List<Integer> chunks) {
+				return Boolean.TRUE;
 			}
 
 			protected void done() {
@@ -128,7 +125,7 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 		return true;
 	}
 
-	private void loadProjectsLocaly() {
+	private void selectProject() {
 		final JSONArray json = new JSONArray(projects);
 
 		ArrayList<String> list = new ArrayList<String>();
@@ -149,13 +146,13 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 					JPanel p1 = new JPanel(new GridBagLayout());
 					p1.add(new JLabel("Please Wait..."), new GridBagConstraints());
 					d.getContentPane().add(p1);
-					d.setSize(100, 100);
+					d.setSize(200, 200);
 					d.setLocationRelativeTo(mainFrame);
 					d.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 					d.setModal(true);
 					final int j = i;
 
-					SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
+					SwingWorker<?, ?> worker = new SwingWorker<Void, Void>() {
 						protected Void doInBackground() throws InterruptedException {
 
 							String URL = "https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsJSON/"
@@ -189,14 +186,10 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 								p.setId(id);
 								mainFrame.setModel(p);
 							} catch (MmfException | IOException | ParsingException e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
 
 							return null;
-						}
-
-						protected void process(List<Integer> chunks) {
 						}
 
 						protected void done() {
@@ -205,8 +198,6 @@ public class LoadProjectsRemotelyAction extends MainAbstractAction {
 					};
 					worker.execute();
 					d.setVisible(true);
-
-					break;
 				}
 			}
 		}

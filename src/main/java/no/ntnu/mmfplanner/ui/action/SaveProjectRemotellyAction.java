@@ -13,7 +13,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.List;
+import java.io.IOException;
+import java.io.StringWriter;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -33,20 +34,18 @@ import org.restlet.data.Method;
 import org.restlet.data.Parameter;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 
 /**
  * Serializes the current project to XML and saves it to disk.
  */
 public class SaveProjectRemotellyAction extends MainAbstractAction {
 
+	private Boolean saveOrUpdate = null;
 	private static final long serialVersionUID = 1L;
-
 	public static final String ACTION_NAME = "Save or update Project remotelly...";
-
 	public static final int ACTION_MNEMONIC = KeyEvent.VK_S;
-
 	public static final String ACTION_ACCELERATOR = "ctrl S";
-
 	public static final String ACTION_DESCRIPTION = "Save or update the current project";
 
 	public SaveProjectRemotellyAction(MainFrame mainFrame) {
@@ -63,18 +62,21 @@ public class SaveProjectRemotellyAction extends MainAbstractAction {
 	}
 
 	public boolean save() {
-
 		final JDialog d = new JDialog();
+		final boolean save = mainFrame.getProject().getId() == null ? true
+				: "".equals(mainFrame.getProject().getId()) ? true : false;
+
 		JPanel p1 = new JPanel(new GridBagLayout());
 		p1.add(new JLabel("Please Wait..."), new GridBagConstraints());
 		d.getContentPane().add(p1);
-		d.setSize(100, 100);
+		d.setSize(200, 200);
 		d.setLocationRelativeTo(mainFrame);
 		d.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		d.setModal(true);
 
-		SwingWorker<?, ?> worker = new SwingWorker<Void, Integer>() {
-			protected Void doInBackground() throws InterruptedException {
+		SwingWorker<?, ?> worker = new SwingWorker<Boolean, Void>() {
+			protected Boolean doInBackground() throws InterruptedException {
+				final StringWriter response = new StringWriter();
 
 				Document document = XmlSerializer.workspaceToDocument(mainFrame.getTabPanePanelPlacement(),
 						mainFrame.getProject());
@@ -89,42 +91,54 @@ public class SaveProjectRemotellyAction extends MainAbstractAction {
 				String URL = "https://api.mlab.com/api/1/databases/mmf_planner_db/collections/projectsJSON/";
 
 				// Save or Update
-				if (!"".equals(mainFrame.getProject().getId())) {
+				if (!save) {
 					URL = URL + mainFrame.getProject().getId();
 				}
-				
+
 				ClientResource clientJSON = new ClientResource(URL);
 
 				Parameter apiKey = new Parameter("apiKey", "r5Kh17D7-6KVNy70vxx-aY20h7_2Pb4Q");
-				clientJSON.addQueryParameter(apiKey); 
+				clientJSON.addQueryParameter(apiKey);
 				clientJSON.getReference().addQueryParameter("format", "json");
-				
+
 				// Save or Update
-				if ("".equals(mainFrame.getProject().getId())) {
+				if (save) {
 					clientJSON.setMethod(Method.POST);
-					clientJSON.post(stringRep, MediaType.APPLICATION_JSON);
+					try {
+						clientJSON.post(stringRep, MediaType.APPLICATION_JSON).write(response);
+					} catch (ResourceException | IOException e) {
+						e.printStackTrace();
+						return Boolean.FALSE;
+					}
 				} else {
 					clientJSON.setMethod(Method.PUT);
 					clientJSON.put(stringRep, MediaType.APPLICATION_JSON);
 				}
 
 				if (!clientJSON.getStatus().isSuccess()) {
-					// TODO
+					return Boolean.FALSE;
+				} else {
+					if (save) {
+						mainFrame.getProject().setId(
+								new JSONObject(response.toString()).getJSONObject("_id").getString("$oid"));
+					}
+					return Boolean.TRUE;
 				}
-
-				return null;
-			}
-
-			protected void process(List<Integer> chunks) {
 			}
 
 			protected void done() {
 				d.dispose();
+				try {
+					saveOrUpdate = get();
+				} catch (Exception e) {
+					e.printStackTrace();
+					saveOrUpdate = Boolean.FALSE;
+				}
 			}
 		};
 		worker.execute();
 		d.setVisible(true);
 
-		return true;
+		return saveOrUpdate.booleanValue();
 	}
 }
