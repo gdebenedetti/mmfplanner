@@ -29,7 +29,6 @@ import no.ntnu.mmfplanner.model.Mmf;
 import no.ntnu.mmfplanner.model.Project;
 import no.ntnu.mmfplanner.ui.action.DeleteCategoryAction;
 import no.ntnu.mmfplanner.ui.action.DeleteMmfAction;
-import no.ntnu.mmfplanner.ui.action.SimpleLookAheadSortAction;
 import no.ntnu.mmfplanner.ui.action.HideTabAction;
 import no.ntnu.mmfplanner.ui.action.LoadProjectsRemotelyAction;
 import no.ntnu.mmfplanner.ui.action.LoadTestProjectAction;
@@ -44,7 +43,9 @@ import no.ntnu.mmfplanner.ui.action.PrecursorSortAction;
 import no.ntnu.mmfplanner.ui.action.SaveProjectAction;
 import no.ntnu.mmfplanner.ui.action.SaveProjectRemotellyAction;
 import no.ntnu.mmfplanner.ui.action.SetMmfDistributionAction;
+import no.ntnu.mmfplanner.ui.action.SimpleLookAheadSortAction;
 import no.ntnu.mmfplanner.ui.action.SwimlaneSortAction;
+import no.ntnu.mmfplanner.ui.action.WeightedLookAheadSortAction;
 import no.ntnu.mmfplanner.ui.graph.GraphCanvas;
 import no.ntnu.mmfplanner.ui.graph.NpvChart;
 import no.ntnu.mmfplanner.ui.graph.SaNpvChart;
@@ -142,22 +143,22 @@ public class MainFrame extends JFrame {
 			return false;
 		}
 
-		String[] options = new String[] {"To local file", "Remote", "No"};
-	    int response = JOptionPane.showOptionDialog(this, "Do you want to save this project before you close it?", "Save?",
-	        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-		
-		if(response == 0) {
+		String[] options = new String[] { "To local file", "Remote", "No" };
+		int response = JOptionPane.showOptionDialog(this, "Do you want to save this project before you close it?",
+				"Save?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+
+		if (response == 0) {
 			SaveProjectAction save = new SaveProjectAction(this);
 			return !save.save();
-		} else if(response == 1) {
+		} else if (response == 1) {
 			SaveProjectRemotellyAction save = new SaveProjectRemotellyAction(this);
 			return !save.save();
-		} else if(response == 2) {
+		} else if (response == 2) {
 			return false;
 		} else {
 			return true;
 		}
-	    
+
 	}
 
 	public void updateTitle() {
@@ -184,7 +185,8 @@ public class MainFrame extends JFrame {
 		project.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				if (evt.getPropertyName().equals(Mmf.EVENT_REVENUES) || evt.getPropertyName().equals(Project.EVENT_MMFS)) {
+				if (evt.getPropertyName().equals(Mmf.EVENT_REVENUES)
+						|| evt.getPropertyName().equals(Project.EVENT_MMFS)) {
 					editSetMmfDistributionMenuItem.setVisible(true);
 				}
 			}
@@ -299,6 +301,7 @@ public class MainFrame extends JFrame {
 		sortPrecursorMenuItem.setAction(new PrecursorSortAction(this));
 		sortGreedyMenuItem.setAction(new OptimalSortAction(this));
 		sortSimpleLookAheadMenuItem.setAction(new SimpleLookAheadSortAction(this));
+		sortWeightedLookAheadMenuItem.setAction(new WeightedLookAheadSortAction(this));
 
 		// tabs
 		placement = new TabPanePanelPlacement(viewMenu);
@@ -450,6 +453,7 @@ public class MainFrame extends JFrame {
 		menuSeparator = new javax.swing.JSeparator();
 		sortGreedyMenuItem = new javax.swing.JMenuItem();
 		sortSimpleLookAheadMenuItem = new javax.swing.JMenuItem();
+		sortWeightedLookAheadMenuItem = new javax.swing.JMenuItem();
 		helpMenu = new javax.swing.JMenu();
 		helpAboutMenuItem = new javax.swing.JMenuItem();
 
@@ -757,6 +761,7 @@ public class MainFrame extends JFrame {
 		sortMenu.add(menuSeparator);
 		sortMenu.add(sortGreedyMenuItem);
 		sortMenu.add(sortSimpleLookAheadMenuItem);
+		sortMenu.add(sortWeightedLookAheadMenuItem);
 
 		mainMenuBar.add(sortMenu);
 
@@ -861,6 +866,7 @@ public class MainFrame extends JFrame {
 	private javax.swing.JScrollPane sanpvTableScrollPane;
 	private javax.swing.JMenuItem sortGreedyMenuItem;
 	private javax.swing.JMenuItem sortSimpleLookAheadMenuItem;
+	private javax.swing.JMenuItem sortWeightedLookAheadMenuItem;
 	private javax.swing.JMenu sortMenu;
 	private javax.swing.JMenuItem sortPrecursorMenuItem;
 	private javax.swing.JMenuItem sortPrettyMenuItem;

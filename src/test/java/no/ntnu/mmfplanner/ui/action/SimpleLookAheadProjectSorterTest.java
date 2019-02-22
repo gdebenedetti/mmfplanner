@@ -1,26 +1,25 @@
 package no.ntnu.mmfplanner.ui.action;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import no.ntnu.mmfplanner.model.SimpleLookAheadProjectSorter;
 import no.ntnu.mmfplanner.model.Mmf;
 import no.ntnu.mmfplanner.model.MmfException;
 import no.ntnu.mmfplanner.model.Project;
 import no.ntnu.mmfplanner.model.ProjectRoi;
 import no.ntnu.mmfplanner.model.ProjectSorter;
 import no.ntnu.mmfplanner.model.ProjectSorter.Result;
+import no.ntnu.mmfplanner.model.SimpleLookAheadProjectSorter;
 
 import org.junit.Test;
 
 /**
- * TODO: Description of type.
  * 
- * @version $Id:$
  * @author Erik Bagge Ottesen <erikbagg@idi.ntnu.no>
  */
-public class HeuristicProjectSorterTest {
+public class SimpleLookAheadProjectSorterTest {
     private static final int REVENUE_2[][] = new int[][] {
             new int[] { -20, -20, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
             new int[] { -50, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 } };

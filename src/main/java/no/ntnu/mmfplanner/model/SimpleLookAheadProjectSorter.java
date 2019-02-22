@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This class uses the IFM heuristic, also known as the simple look-ahead
+ * This class uses the Simple Look-Ahead algorithm, also known as the simple look-ahead
  * approach, to find the optimal NPV of a project.
  */
 public class SimpleLookAheadProjectSorter extends ProjectSorter {
