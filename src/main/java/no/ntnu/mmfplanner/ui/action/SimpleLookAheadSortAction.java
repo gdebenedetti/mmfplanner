@@ -12,24 +12,23 @@ package no.ntnu.mmfplanner.ui.action;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import no.ntnu.mmfplanner.model.HeuristicProjectSorter;
-import no.ntnu.mmfplanner.model.ProjectSorter;
+import no.ntnu.mmfplanner.model.SimpleLookAheadProjectSorter;
 import no.ntnu.mmfplanner.ui.MainFrame;
 import no.ntnu.mmfplanner.ui.SortDialog;
 
 /**
- * Starts a {@link HeuristicProjectSorter} instance as a new thread, and opens the {@link SortDialog}
+ * Starts a {@link SimpleLookAheadProjectSorter} instance as a new thread, and opens the {@link SortDialog}
  */
-public class HeuristicSortAction extends MainAbstractAction {
+public class SimpleLookAheadSortAction extends MainAbstractAction {
     private static final long serialVersionUID = 1L;
 
-    public static final String ACTION_NAME = "IFM Heuristic Sort";
+    public static final String ACTION_NAME = "Simple Look-Ahead Sort";
 
     public static final int ACTION_KEY = KeyEvent.VK_H;
 
-    public static final String ACTION_DESCRIPTION = "Use IFM heuristic algorithm to get the optimal NPV";
+    public static final String ACTION_DESCRIPTION = "Use Simple Look-Ahead algorithm to get the optimal NPV";
 
-    public HeuristicSortAction(MainFrame mainFrame) {
+    public SimpleLookAheadSortAction(MainFrame mainFrame) {
         super(mainFrame, ACTION_NAME, ACTION_KEY, null, ACTION_DESCRIPTION);
 
     }
@@ -38,9 +37,9 @@ public class HeuristicSortAction extends MainAbstractAction {
      * Start the IFM Heuristic sorter
      */
     public void actionPerformed(ActionEvent e) {
-    	HeuristicProjectSorter heuristicSorter = new HeuristicProjectSorter(mainFrame.getProject());
-        SortDialog sortDialog = new SortDialog(mainFrame, enabled, heuristicSorter);
-        heuristicSorter.start(true);
+    	SimpleLookAheadProjectSorter simpleLookAheadProjectSorter = new SimpleLookAheadProjectSorter(mainFrame.getProject());
+        SortDialog sortDialog = new SortDialog(mainFrame, enabled, simpleLookAheadProjectSorter);
+        simpleLookAheadProjectSorter.start(true);
         sortDialog.setVisible(true);
     }
 

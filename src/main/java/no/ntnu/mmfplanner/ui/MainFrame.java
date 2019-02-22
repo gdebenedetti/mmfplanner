@@ -29,7 +29,7 @@ import no.ntnu.mmfplanner.model.Mmf;
 import no.ntnu.mmfplanner.model.Project;
 import no.ntnu.mmfplanner.ui.action.DeleteCategoryAction;
 import no.ntnu.mmfplanner.ui.action.DeleteMmfAction;
-import no.ntnu.mmfplanner.ui.action.HeuristicSortAction;
+import no.ntnu.mmfplanner.ui.action.SimpleLookAheadSortAction;
 import no.ntnu.mmfplanner.ui.action.HideTabAction;
 import no.ntnu.mmfplanner.ui.action.LoadProjectsRemotelyAction;
 import no.ntnu.mmfplanner.ui.action.LoadTestProjectAction;
@@ -298,7 +298,7 @@ public class MainFrame extends JFrame {
 		sortPrettyMenuItem.setAction(new SwimlaneSortAction(this));
 		sortPrecursorMenuItem.setAction(new PrecursorSortAction(this));
 		sortGreedyMenuItem.setAction(new OptimalSortAction(this));
-		sortHeuristicMenuItem.setAction(new HeuristicSortAction(this));
+		sortSimpleLookAheadMenuItem.setAction(new SimpleLookAheadSortAction(this));
 
 		// tabs
 		placement = new TabPanePanelPlacement(viewMenu);
@@ -449,7 +449,7 @@ public class MainFrame extends JFrame {
 		sortPrettyMenuItem = new javax.swing.JMenuItem();
 		menuSeparator = new javax.swing.JSeparator();
 		sortGreedyMenuItem = new javax.swing.JMenuItem();
-		sortHeuristicMenuItem = new javax.swing.JMenuItem();
+		sortSimpleLookAheadMenuItem = new javax.swing.JMenuItem();
 		helpMenu = new javax.swing.JMenu();
 		helpAboutMenuItem = new javax.swing.JMenuItem();
 
@@ -756,7 +756,7 @@ public class MainFrame extends JFrame {
 		sortMenu.add(sortPrettyMenuItem);
 		sortMenu.add(menuSeparator);
 		sortMenu.add(sortGreedyMenuItem);
-		sortMenu.add(sortHeuristicMenuItem);
+		sortMenu.add(sortSimpleLookAheadMenuItem);
 
 		mainMenuBar.add(sortMenu);
 
@@ -860,7 +860,7 @@ public class MainFrame extends JFrame {
 	private javax.swing.JPanel sanpvTablePanel;
 	private javax.swing.JScrollPane sanpvTableScrollPane;
 	private javax.swing.JMenuItem sortGreedyMenuItem;
-	private javax.swing.JMenuItem sortHeuristicMenuItem;
+	private javax.swing.JMenuItem sortSimpleLookAheadMenuItem;
 	private javax.swing.JMenu sortMenu;
 	private javax.swing.JMenuItem sortPrecursorMenuItem;
 	private javax.swing.JMenuItem sortPrettyMenuItem;

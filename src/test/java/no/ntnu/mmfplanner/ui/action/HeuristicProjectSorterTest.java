@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import no.ntnu.mmfplanner.model.HeuristicProjectSorter;
+import no.ntnu.mmfplanner.model.SimpleLookAheadProjectSorter;
 import no.ntnu.mmfplanner.model.Mmf;
 import no.ntnu.mmfplanner.model.MmfException;
 import no.ntnu.mmfplanner.model.Project;
@@ -55,7 +55,7 @@ public class HeuristicProjectSorterTest {
     }
 
     protected ProjectSorter runSorter() {
-        ProjectSorter sorter = new HeuristicProjectSorter(project);
+        ProjectSorter sorter = new SimpleLookAheadProjectSorter(project);
         sorter.start(false);
         return sorter;
     }
@@ -107,7 +107,7 @@ public class HeuristicProjectSorterTest {
     }
 
     /**
-     * Test method for {@link HeuristicProjectSorter#sort()} with two MMFs and
+     * Test method for {@link SimpleLookAheadProjectSorter#sort()} with two MMFs and
      * one dependency.
      */
     @Test
