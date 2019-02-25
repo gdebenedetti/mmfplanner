@@ -236,4 +236,51 @@ public abstract class ProjectSorter implements Runnable {
         }
         setDone(true);
     }
+    
+	/**
+	 * Generates all MMF-strands from the given MMFs.
+	 * 
+	 * @param usedMmfs
+	 * 
+	 * @param usedMmfs
+	 * @return
+	 */
+	protected List<List<Mmf>> generateStrands(List<Mmf> availableMmfs, List<Mmf> usedMmfs) {
+		List<List<Mmf>> strands = new ArrayList<List<Mmf>>();
+		List<Mmf> mmfs = new ArrayList<Mmf>(availableMmfs);
+
+		// repeat until no more mmfs are available
+		while (mmfs.size() > 0) {
+			for (int i = mmfs.size() - 1; i >= 0; i--) {
+				Mmf mmf = mmfs.get(i);
+				List<Mmf> precursors = new ArrayList<Mmf>(mmf.getPrecursors());
+				precursors.removeAll(usedMmfs);
+
+				// if this mmf has no precursors, add it to the strands
+				if (precursors.size() == 0) {
+					strands.add(Collections.singletonList(mmf));
+					mmfs.remove(mmf);
+					continue;
+				}
+
+				// go over all the existing strands, if all precursors are
+				// available in a strand, and the strand contain only these
+				// precursors: add the given mmf and remove it from
+				// the available mmfs.
+				for (int j = 0; j < strands.size(); j++) {
+					List<Mmf> strand = strands.get(j);
+					if (/* (strand.size() == precursors.size()) && */strand.containsAll(precursors)) {
+						ArrayList<Mmf> newStrand = new ArrayList<Mmf>(strand);
+						newStrand.add(mmf);
+
+						strands.add(newStrand);
+						mmfs.remove(mmf);
+						break;
+					}
+				}
+			}
+		}
+
+		return strands;
+	}
 }

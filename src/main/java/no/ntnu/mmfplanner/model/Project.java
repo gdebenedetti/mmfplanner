@@ -27,6 +27,7 @@ public class Project implements PropertyChangeListener {
 	public static final String EVENT_NAME = "project.name";
 	public static final String EVENT_PERIODS = "project.periods";
 	public static final String EVENT_INTEREST_RATE = "project.interestRate";
+	public static final String EVENT_WEIGHTING_FACTOR = "project.weightingFactor";
 	public static final String EVENT_CATEGORIES = "project.categories";
 	public static final String EVENT_MMFS = "project.mmfs";
 	public static final String EVENT_MAX_MMFS = "project.maxMMFs";
@@ -35,6 +36,7 @@ public class Project implements PropertyChangeListener {
 	private String name;
 	private int periods;
 	private double interestRate;
+	private double weightFactor;
 	private List<Category> categories;
 	private List<Mmf> mmfs;
 	private String nextId;
@@ -49,6 +51,7 @@ public class Project implements PropertyChangeListener {
 		this.name = "New Project";
 		this.periods = 12;
 		this.interestRate = 0.008;
+		this.weightFactor = 0.1;
 		this.nextId = "A";
 		this.categories = new ArrayList<Category>();
 		this.mmfs = new ArrayList<Mmf>();
@@ -56,11 +59,12 @@ public class Project implements PropertyChangeListener {
 		this.changeSupport = new PropertyChangeSupport(this);
 	}
 
-	public Project(String name, int periods, double interestRate, int maxMmfsPerPeriod) {
+	public Project(String name, int periods, double interestRate, int maxMmfsPerPeriod, double weightingFactor) {
 		super();
 		this.name = name;
 		this.periods = periods;
 		this.interestRate = interestRate;
+		this.weightFactor = weightingFactor;
 		this.maxMmfsPerPeriod = maxMmfsPerPeriod;
 		this.nextId = "A";
 		this.mmfs = new ArrayList<Mmf>();
@@ -121,6 +125,20 @@ public class Project implements PropertyChangeListener {
 		double oldValue = this.interestRate;
 		this.interestRate = interestRate;
 		changeSupport.firePropertyChange(EVENT_INTEREST_RATE, oldValue, interestRate);
+	}
+
+	public double getWeightFactor() {
+		return weightFactor;
+	}
+
+	/**
+	 * Sets the weighting factor of the project and fires the event EVENT_WEIGHTING_FACTOR. The value should
+	 * be absolute, not in percent. (i.e. 12% = 0.12)
+	 */
+	public void setWeightFactor(double weightFactor) {
+		double oldValue = this.weightFactor;
+		this.weightFactor = weightFactor;
+		changeSupport.firePropertyChange(EVENT_WEIGHTING_FACTOR, oldValue, weightFactor);
 	}
 
 	/**

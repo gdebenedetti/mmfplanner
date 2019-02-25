@@ -105,6 +105,7 @@ public class MainFrame extends JFrame {
 
 		try {
 			project.setInterestRate(0.008);
+			project.setWeightFactor(0.1);
 			project.setPeriods(12);
 			project.addCategory(new Category("Graph display and manipulation", TangoColor.CHAMELEON_1, null));
 			project.addCategory(new Category("Miscellaneous", TangoColor.BUTTER_1, project.getCategory(0)));
@@ -249,7 +250,7 @@ public class MainFrame extends JFrame {
 		}
 
 		projectPropertiesAdapter = new ProjectPropertiesAdapter(periodsTextField, interestRateTextField,
-				projectNameTextField, maxMmfsPerPeriodTextField, null);
+				weightedFactorTextField, projectNameTextField, maxMmfsPerPeriodTextField, null);
 
 		// Tables
 		categoryTable.setDefaultEditor(Category.class, new DefaultCellEditor(categoryComboBox));
@@ -392,6 +393,8 @@ public class MainFrame extends JFrame {
 		periodsTextField = new javax.swing.JFormattedTextField();
 		interestRateLabel = new javax.swing.JLabel();
 		interestRateTextField = new javax.swing.JTextField();
+		weightedFactorLabel = new javax.swing.JLabel();
+		weightedFactorTextField = new javax.swing.JTextField();
 		categoryLabel = new javax.swing.JLabel();
 		categoryTableScrollPane = new javax.swing.JScrollPane();
 		categoryTable = new javax.swing.JTable();
@@ -473,11 +476,17 @@ public class MainFrame extends JFrame {
 
 		interestRateTextField.setMinimumSize(new java.awt.Dimension(100, 21));
 
+		weightedFactorLabel.setText("Weight Factor (%):");
+
+		weightedFactorTextField.setMinimumSize(new java.awt.Dimension(100, 21));
+		maxMmfsPerPeriodTextField
+				.setToolTipText("Practice suggests that for a 16-period analysis the weighting factor should be set to 10%–15%, while for an eight-period analysis the factor should be set to 20%–25%.");
+
 		categoryLabel.setText("Categories:");
 
 		categoryTableScrollPane.setViewportView(categoryTable);
 
-		maxMmfsPerPeriodLabel.setText("<html>NPV sorting,<br>concurrent developed MMFs:</html>");
+		maxMmfsPerPeriodLabel.setText("Concurrent developed MMFs:");
 
 		maxMmfsPerPeriodTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(
 				new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
@@ -498,7 +507,7 @@ public class MainFrame extends JFrame {
 												projectPropPanelLayout
 														.createParallelGroup(GroupLayout.Alignment.LEADING)
 														.addComponent(periodsLabel).addComponent(projectNameLabel)
-														.addComponent(interestRateLabel).addComponent(categoryLabel))
+														.addComponent(interestRateLabel).addComponent(weightedFactorLabel).addComponent(categoryLabel))
 										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 										.addGroup(
 												projectPropPanelLayout
@@ -523,6 +532,12 @@ public class MainFrame extends JFrame {
 																												Short.MAX_VALUE)
 																										.addComponent(
 																												periodsTextField,
+																												GroupLayout.Alignment.TRAILING,
+																												GroupLayout.DEFAULT_SIZE,
+																												125,
+																												Short.MAX_VALUE)
+																										.addComponent(
+																												weightedFactorTextField,
 																												GroupLayout.Alignment.TRAILING,
 																												GroupLayout.DEFAULT_SIZE,
 																												125,
@@ -580,6 +595,16 @@ public class MainFrame extends JFrame {
 																				GroupLayout.Alignment.BASELINE)
 																		.addComponent(interestRateLabel)
 																		.addComponent(interestRateTextField,
+																				GroupLayout.PREFERRED_SIZE,
+																				GroupLayout.DEFAULT_SIZE,
+																				GroupLayout.PREFERRED_SIZE))
+														.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+														.addGroup(
+																projectPropPanelLayout
+																		.createParallelGroup(
+																				GroupLayout.Alignment.BASELINE)
+																		.addComponent(weightedFactorLabel)
+																		.addComponent(weightedFactorTextField,
 																				GroupLayout.PREFERRED_SIZE,
 																				GroupLayout.DEFAULT_SIZE,
 																				GroupLayout.PREFERRED_SIZE)))
@@ -832,6 +857,8 @@ public class MainFrame extends JFrame {
 	private javax.swing.JMenu helpMenu;
 	private javax.swing.JLabel interestRateLabel;
 	private javax.swing.JTextField interestRateTextField;
+	private javax.swing.JLabel weightedFactorLabel;
+	private javax.swing.JTextField weightedFactorTextField;
 	private javax.swing.JMenuItem lowerPaneHideMenuItem;
 	private javax.swing.JMenuItem lowerPaneMoveMenuItem;
 	private javax.swing.JPopupMenu lowerPanePopupMenu;

@@ -75,6 +75,7 @@ public class XmlSerializer {
         appendTextNode(eproj, "name", project.getName());
         appendTextNode(eproj, "periods", project.getPeriods());
         appendTextNode(eproj, "interestrate", project.getInterestRate());
+        appendTextNode(eproj, "weightfactor", project.getWeightFactor());
         appendTextNode(eproj, "nextid", project.getNextId());
         appendTextNode(eproj, "maxmmfs", project.getMaxMmfsPerPeriod());
 

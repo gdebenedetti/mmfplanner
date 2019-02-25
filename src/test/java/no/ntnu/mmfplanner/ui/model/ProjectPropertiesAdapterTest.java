@@ -32,6 +32,7 @@ public class ProjectPropertiesAdapterTest extends ProjectTestFixture {
     ProjectPropertiesAdapter propAdapter;
     private JFormattedTextField periodsTextField;
     private JTextField interestRateTextField;
+    private JTextField weightedFactorTextField;
     private JTextField projectNameTextField;
     private JFormattedTextField maxMmfsPerPeriodTextField;
 
@@ -46,7 +47,7 @@ public class ProjectPropertiesAdapterTest extends ProjectTestFixture {
 
         // Initialize the adapter
         propAdapter = new ProjectPropertiesAdapter(periodsTextField,
-                interestRateTextField, projectNameTextField,
+                interestRateTextField, weightedFactorTextField, projectNameTextField,
                 maxMmfsPerPeriodTextField, project);
     }
 
